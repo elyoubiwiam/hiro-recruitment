@@ -19,12 +19,12 @@ export const PUBLIC = ["/", "/auth", "/reset-password"];
 const THEME_KEY = "talentdesk-theme";
 
 function useTheme() {
-  const [dark, setDark] = useState(false);
+  const [dark, setDark] = useState<boolean | null>(null);
   useEffect(() => {
-    const saved = localStorage.getItem(THEME_KEY);
-    if (saved) setDark(saved === "dark");
+    setDark(localStorage.getItem(THEME_KEY) === "dark");
   }, []);
   useEffect(() => {
+    if (dark === null) return;
     document.documentElement.classList.toggle("dark", dark);
     localStorage.setItem(THEME_KEY, dark ? "dark" : "light");
   }, [dark]);
