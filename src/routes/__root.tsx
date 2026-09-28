@@ -7,7 +7,7 @@ import {
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
-import { useEffect, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
@@ -138,6 +138,16 @@ function RootComponent() {
     return () => data.subscription.unsubscribe();
   }, [router]);
 
+  const [theme, setTheme] = useState<"dark" | "light">("dark");
+  useEffect(() => {
+    const update = () => setTheme(document.documentElement.classList.contains("dark") ? "dark" : "light");
+    update();
+    const obs = new MutationObserver(update);
+    obs.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
+    return () => obs.disconnect();
+  }, []);
+
+
 
   return (
     <QueryClientProvider client={queryClient}>
@@ -146,7 +156,7 @@ function RootComponent() {
         <AppShell>
           <Outlet />
         </AppShell>
-        <Toaster theme="dark" richColors />
+        <Toaster theme={theme} richColors />
       </StoreProvider>
     </QueryClientProvider>
   );
