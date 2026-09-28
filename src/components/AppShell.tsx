@@ -35,6 +35,7 @@ export function AppShell({ children }: { children: ReactNode }) {
   const { tracks, email, isAdmin, loading } = useStore();
   const due = tracks.filter((t) => ["overdue", "today"].includes(bucketOf(t))).length;
   const reminded = useRef(false);
+  const [dark, setDark] = useTheme();
 
   useEffect(() => {
     if (loading || reminded.current || !email) return;
@@ -52,7 +53,14 @@ export function AppShell({ children }: { children: ReactNode }) {
           <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
             <div className="h-3.5 w-3.5 rounded-sm border-2 border-primary-foreground" />
           </div>
-          <span className="text-lg font-bold tracking-tight text-foreground">Talentdesk</span>
+          <span className="flex-1 text-lg font-bold tracking-tight text-foreground">Talentdesk</span>
+          <button
+            onClick={() => setDark(!dark)}
+            aria-label={dark ? "Switch to light mode" : "Switch to dark mode"}
+            className="flex h-8 w-8 items-center justify-center rounded-lg border text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+          >
+            {dark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+          </button>
         </div>
         <nav className="flex flex-col gap-0.5">
           {NAV.map((n) => {
