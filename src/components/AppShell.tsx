@@ -1,6 +1,6 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { Briefcase, CalendarCheck, FileSearch, LogOut, MessagesSquare, PhoneCall, ShieldCheck, Users } from "lucide-react";
-import { useEffect, useRef, type ReactNode } from "react";
+import { Briefcase, CalendarCheck, FileSearch, LogOut, MessagesSquare, Moon, PhoneCall, ShieldCheck, Sun, Users } from "lucide-react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { toast } from "sonner";
 import { useStore } from "@/lib/store";
 import { bucketOf } from "@/lib/tracking";
@@ -16,11 +16,27 @@ const NAV = [
 
 export const PUBLIC = ["/", "/auth", "/reset-password"];
 
+const THEME_KEY = "talentdesk-theme";
+
+function useTheme() {
+  const [dark, setDark] = useState(true);
+  useEffect(() => {
+    const saved = localStorage.getItem(THEME_KEY);
+    if (saved) setDark(saved === "dark");
+  }, []);
+  useEffect(() => {
+    document.documentElement.classList.toggle("dark", dark);
+    localStorage.setItem(THEME_KEY, dark ? "dark" : "light");
+  }, [dark]);
+  return [dark, setDark] as const;
+}
+
 export function AppShell({ children }: { children: ReactNode }) {
   const path = useRouterState({ select: (s) => s.location.pathname });
   const { tracks, email, isAdmin, loading } = useStore();
   const due = tracks.filter((t) => ["overdue", "today"].includes(bucketOf(t))).length;
   const reminded = useRef(false);
+  const [dark, setDark] = useTheme();
 
   useEffect(() => {
     if (loading || reminded.current || !email) return;
@@ -38,7 +54,14 @@ export function AppShell({ children }: { children: ReactNode }) {
           <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
             <div className="h-3.5 w-3.5 rounded-sm border-2 border-primary-foreground" />
           </div>
-          <span className="text-lg font-bold tracking-tight text-foreground">Talentdesk</span>
+          <span className="flex-1 text-lg font-bold tracking-tight text-foreground">Talentdesk</span>
+          <button
+            onClick={() => setDark(!dark)}
+            aria-label={dark ? "Switch to light mode" : "Switch to dark mode"}
+            className="flex h-8 w-8 items-center justify-center rounded-lg border text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+          >
+            {dark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+          </button>
         </div>
         <nav className="flex flex-col gap-0.5">
           {NAV.map((n) => {
@@ -69,12 +92,19 @@ export function AppShell({ children }: { children: ReactNode }) {
         </div>
       </aside>
       <div className="flex min-w-0 flex-1 flex-col">
-        <nav className="flex gap-1 overflow-x-auto border-b bg-card p-2 md:hidden">
+        <nav className="flex items-center gap-1 overflow-x-auto border-b bg-card p-2 md:hidden">
           {NAV.map((n) => (
             <Link key={n.to} to={n.to} className="whitespace-nowrap rounded-md px-3 py-1.5 text-xs font-medium text-muted-foreground">
               {n.label}
             </Link>
           ))}
+          <button
+            onClick={() => setDark(!dark)}
+            aria-label={dark ? "Switch to light mode" : "Switch to dark mode"}
+            className="ml-auto flex h-7 w-7 shrink-0 items-center justify-center rounded-md border text-muted-foreground"
+          >
+            {dark ? <Sun className="h-3.5 w-3.5" /> : <Moon className="h-3.5 w-3.5" />}
+          </button>
         </nav>
         <main className="mx-auto w-full max-w-6xl flex-1 p-6 md:p-10">{children}</main>
       </div>
