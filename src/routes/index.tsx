@@ -89,11 +89,11 @@ function Dashboard() {
       </div>
 
       {view === "pipeline" ? (
-        <div className="grid gap-3 overflow-x-auto lg:grid-cols-5">
+        <div className="flex gap-3 overflow-x-auto pb-2">
           {STAGES.map((s) => {
             const col = shown.filter((j) => j.stage === s.id);
             return (
-              <div key={s.id} className="min-w-56 rounded-lg bg-muted/60 p-3">
+              <div key={s.id} className="min-w-52 flex-1 rounded-lg bg-muted/60 p-3">
                 <div className="mb-3 flex justify-between text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                   {s.label}<span>{col.length}</span>
                 </div>
