@@ -1,6 +1,7 @@
 import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { seedCandidates, seedClients, seedJobs, seedTranscripts } from "./seed";
 import type { Candidate, Client, Job, MatchRecord, MatchResult, Track, Transcript } from "./types";
 
 type Row = Record<string, any>;
@@ -17,6 +18,26 @@ interface Data {
   transcripts: Transcript[];
   tracks: Track[];
 }
+const DEMO = true; // accounts disabled for now — data lives in this browser
+const LS_KEY = "talentdesk-demo-v1";
+const hrs = (h: number) => new Date(Date.now() + h * 3600000).toISOString();
+function demoSeed(): Data {
+  const t = (id: string, candidateId: string, jobId: string, step: number, next: string, history: number[]): Track => ({
+    id, candidateId, jobId, step, status: "active", nextContactAt: next,
+    lastContactedAt: history.length ? hrs(-history[history.length - 1]!) : null,
+    history: history.map((h, i) => ({ step: i, sentAt: hrs(-h) })), drafts: {}, notes: "", createdAt: hrs(-240),
+  });
+  return {
+    clients: seedClients, jobs: seedJobs, candidates: seedCandidates, matches: [],
+    transcripts: seedTranscripts.map((x) => ({ ...x, result: x.result ?? null })),
+    tracks: [
+      t("k1", "p1", "j1", 2, hrs(-20), [120, 70]),
+      t("k2", "p2", "j2", 1, hrs(3), [40]),
+      t("k3", "p3", "j1", 0, hrs(50), []),
+    ],
+  };
+}
+const uid = () => (crypto as any).randomUUID?.() ?? Math.random().toString(36).slice(2);
 const empty: Data = { clients: [], jobs: [], candidates: [], matches: [], transcripts: [], tracks: [] };
 
 interface Store extends Data {
@@ -47,6 +68,8 @@ function fail(error: { message: string } | null) {
   return false;
 }
 
+export const DEMO_MODE = DEMO;
+
 export function StoreProvider({ children }: { children: ReactNode }) {
   const [data, setData] = useState<Data>(empty);
   const [loading, setLoading] = useState(true);
@@ -54,7 +77,17 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   const [email, setEmail] = useState<string | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
 
+  useEffect(() => {
+    if (DEMO && !loading) localStorage.setItem(LS_KEY, JSON.stringify(data));
+  }, [data, loading]);
+
   const load = useCallback(async () => {
+    if (DEMO) {
+      let d: Data | null = null;
+      try { d = JSON.parse(localStorage.getItem(LS_KEY) || "null"); } catch {}
+      setData(d ?? demoSeed()); setUserId("demo"); setEmail("Demo workspace"); setIsAdmin(false); setLoading(false);
+      return;
+    }
     const { data: u } = await supabase.auth.getUser();
     if (!u.user) {
       setData(empty); setUserId(null); setEmail(null); setIsAdmin(false); setLoading(false);
@@ -84,6 +117,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     load();
+    if (DEMO) return;
     const { data: sub } = supabase.auth.onAuthStateChange((event) => {
       if (event === "SIGNED_IN" || event === "SIGNED_OUT" || event === "USER_UPDATED") load();
     });
@@ -91,11 +125,13 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   }, [load]);
 
   const insert = async <T,>(table: any, row: Row): Promise<T | null> => {
+    if (DEMO) return { status: "active", step: 0, history: [], notes: "", lastContactedAt: null, ...row, id: uid(), createdAt: new Date().toISOString() } as T;
     const { data: d, error } = await supabase.from(table).insert(toRow(row) as any).select().single();
     if (fail(error)) return null;
     return fromRow<T>(d as Row);
   };
   const patch = async (table: any, id: string, p: Row) => {
+    if (DEMO) return;
     const { error } = await supabase.from(table).update(toRow(p) as any).eq("id", id);
     fail(error);
   };
@@ -121,10 +157,16 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     },
     deleteCandidate: async (id) => {
       setData((d) => ({ ...d, candidates: d.candidates.filter((c) => c.id !== id), tracks: d.tracks.filter((t) => t.candidateId !== id) }));
+      if (DEMO) return;
       const { error } = await supabase.from("candidates").delete().eq("id", id);
       fail(error);
     },
     saveMatch: async (candidateId, jobId, result) => {
+      if (DEMO) {
+        const rec: MatchRecord = { candidateId, jobId, result, createdAt: new Date().toISOString() };
+        setData((d) => ({ ...d, matches: [...d.matches.filter((m) => !(m.candidateId === candidateId && m.jobId === jobId)), rec] }));
+        return;
+      }
       const { data: row, error } = await supabase
         .from("matches")
         .upsert({ candidate_id: candidateId, job_id: jobId, result: result as any }, { onConflict: "candidate_id,job_id" })

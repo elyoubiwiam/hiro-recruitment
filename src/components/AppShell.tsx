@@ -1,9 +1,7 @@
-import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
+import { Link, useRouterState } from "@tanstack/react-router";
 import { Briefcase, CalendarCheck, FileSearch, LogOut, MessagesSquare, PhoneCall, ShieldCheck, Users } from "lucide-react";
 import { useEffect, useRef, type ReactNode } from "react";
 import { toast } from "sonner";
-import { useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import { useStore } from "@/lib/store";
 import { bucketOf } from "@/lib/tracking";
 
@@ -21,8 +19,6 @@ export const PUBLIC = ["/", "/auth", "/reset-password"];
 export function AppShell({ children }: { children: ReactNode }) {
   const path = useRouterState({ select: (s) => s.location.pathname });
   const { tracks, email, isAdmin, loading } = useStore();
-  const navigate = useNavigate();
-  const qc = useQueryClient();
   const due = tracks.filter((t) => ["overdue", "today"].includes(bucketOf(t))).length;
   const reminded = useRef(false);
 
@@ -34,12 +30,6 @@ export function AppShell({ children }: { children: ReactNode }) {
 
   if (PUBLIC.includes(path)) return <>{children}</>;
 
-  async function signOut() {
-    await qc.cancelQueries();
-    qc.clear();
-    await supabase.auth.signOut();
-    navigate({ to: "/auth", replace: true });
-  }
 
   return (
     <div className="flex min-h-screen">
@@ -73,8 +63,8 @@ export function AppShell({ children }: { children: ReactNode }) {
           {isAdmin && (
             <div className="flex items-center gap-1 text-accent-foreground"><ShieldCheck className="h-3.5 w-3.5" />Owner · sees all accounts</div>
           )}
-          <button onClick={signOut} className="flex items-center gap-1.5 text-muted-foreground hover:text-foreground">
-            <LogOut className="h-3.5 w-3.5" />Sign out
+          <button onClick={() => { localStorage.removeItem("talentdesk-demo-v1"); location.reload(); }} className="flex items-center gap-1.5 text-muted-foreground hover:text-foreground">
+            <LogOut className="h-3.5 w-3.5" />Reset example data
           </button>
         </div>
       </aside>
