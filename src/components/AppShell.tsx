@@ -91,12 +91,19 @@ export function AppShell({ children }: { children: ReactNode }) {
         </div>
       </aside>
       <div className="flex min-w-0 flex-1 flex-col">
-        <nav className="flex gap-1 overflow-x-auto border-b bg-card p-2 md:hidden">
+        <nav className="flex items-center gap-1 overflow-x-auto border-b bg-card p-2 md:hidden">
           {NAV.map((n) => (
             <Link key={n.to} to={n.to} className="whitespace-nowrap rounded-md px-3 py-1.5 text-xs font-medium text-muted-foreground">
               {n.label}
             </Link>
           ))}
+          <button
+            onClick={() => setDark(!dark)}
+            aria-label={dark ? "Switch to light mode" : "Switch to dark mode"}
+            className="ml-auto flex h-7 w-7 shrink-0 items-center justify-center rounded-md border text-muted-foreground"
+          >
+            {dark ? <Sun className="h-3.5 w-3.5" /> : <Moon className="h-3.5 w-3.5" />}
+          </button>
         </nav>
         <main className="mx-auto w-full max-w-6xl flex-1 p-6 md:p-10">{children}</main>
       </div>
