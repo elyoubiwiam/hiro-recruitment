@@ -1,12 +1,14 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
+import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { callAI } from "./ai.server";
 
 export const runAI = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
   .inputValidator((d) =>
     z
       .object({
-        task: z.enum(["parse_cv", "match", "outreach", "synthesize"]),
+        task: z.enum(["parse_cv", "match", "outreach", "synthesize", "step_draft"]),
         payload: z.any(),
       })
       .parse(d),

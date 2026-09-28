@@ -82,7 +82,7 @@ export interface Transcript {
   jobId: string;
   title: string;
   text: string;
-  result?: SynthesisResult;
+  result?: SynthesisResult | null;
   createdAt: string;
 }
 
@@ -90,5 +90,19 @@ export interface MatchRecord {
   candidateId: string;
   jobId: string;
   result: MatchResult;
+  createdAt: string;
+}
+
+export interface Track {
+  id: string;
+  candidateId: string;
+  jobId: string;
+  step: number;
+  status: "active" | "replied" | "call_booked" | "closed";
+  nextContactAt: string | null;
+  lastContactedAt: string | null;
+  history: { step: number; sentAt: string }[];
+  drafts: Record<string, { subject?: string; body: string }>;
+  notes: string;
   createdAt: string;
 }

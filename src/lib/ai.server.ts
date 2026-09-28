@@ -1,6 +1,7 @@
-type Task = "parse_cv" | "match" | "outreach" | "synthesize";
+type Task = "parse_cv" | "match" | "outreach" | "synthesize" | "step_draft";
 
 const SYSTEM: Record<Task, string> = {
+  step_draft: `You are a top-performing agency recruiter writing ONE message: the next step in a multi-step outreach sequence to a specific candidate for a specific role. Personalize with concrete details from the candidate's background and why they fit THIS role. Account for what was already sent (history) and do not repeat it; follow-ups should add a new angle and get shorter. Channel rules: "LinkedIn connection" max 280 chars, no subject; "InMail pitch" 120-180 words with subject; emails with subject, follow-ups 50-110 words, final check-in 40-70 words and gracefully closes the loop. Warm, concise, no clichés, no emojis. Sign off as "Alex". Reply ONLY with a JSON object: {"subject":string ("" for LinkedIn connection),"body":string}`,
   parse_cv: `You are an expert recruitment CV parser. Extract a structured candidate profile and reply ONLY with a JSON object:
 {"name":string,"email":string,"phone":string,"location":string,"headline":string (current title @ company),"summary":string (2-3 sentences),"skills":string[] (max 20, normalized),"experience":[{"title":string,"company":string,"start":string,"end":string,"highlights":string[]}],"education":[{"degree":string,"school":string,"year":string}],"rawText":string (plain-text transcription of the CV, max 4000 chars)}
 Use "" for unknown fields. Never invent facts.`,
@@ -24,6 +25,9 @@ function buildContent(task: Task, p: any): any[] {
     return [{ type: "input_text", text: `Parse this CV into the JSON profile:\n\n${p.text}` }];
   }
   const ctx = `JOB:\n${JSON.stringify(p.job, null, 2)}\n\nCLIENT:\n${JSON.stringify(p.client ?? {}, null, 2)}\n\nCANDIDATE:\n${JSON.stringify(p.candidate, null, 2)}`;
+  if (task === "step_draft") {
+    return [{ type: "input_text", text: `${ctx}\n\nSTEP TO WRITE: ${JSON.stringify(p.step)}\n\nALREADY SENT: ${JSON.stringify(p.history ?? [])}\n\nProduce the JSON.` }];
+  }
   if (task === "synthesize") {
     return [{ type: "input_text", text: `${ctx}\n\nCALL TRANSCRIPT / NOTES:\n${p.transcript}\n\nProduce the JSON.` }];
   }
