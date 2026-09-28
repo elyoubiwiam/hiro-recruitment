@@ -10,7 +10,7 @@ import { runAI } from "@/lib/ai.functions";
 import { useStore } from "@/lib/store";
 import type { MatchResult } from "@/lib/types";
 
-export const Route = createFileRoute("/screening")({
+export const Route = createFileRoute("/_authenticated/screening")({
   validateSearch: z.object({ candidate: z.string().optional(), job: z.string().optional() }),
   head: () => ({
     meta: [

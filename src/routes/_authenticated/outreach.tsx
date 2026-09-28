@@ -9,7 +9,7 @@ import { runAI } from "@/lib/ai.functions";
 import { useStore } from "@/lib/store";
 import type { OutreachResult } from "@/lib/types";
 
-export const Route = createFileRoute("/outreach")({
+export const Route = createFileRoute("/_authenticated/outreach")({
   validateSearch: z.object({ candidate: z.string().optional(), job: z.string().optional() }),
   head: () => ({
     meta: [

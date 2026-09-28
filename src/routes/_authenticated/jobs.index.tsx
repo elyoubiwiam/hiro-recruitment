@@ -14,7 +14,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { uid, useStore } from "@/lib/store";
 import { STAGES, type Job, type Stage } from "@/lib/types";
 
-export const Route = createFileRoute("/")({
+export const Route = createFileRoute("/_authenticated/jobs/")({
   head: () => ({
     meta: [
       { title: "Clients & Jobs — Talentdesk" },

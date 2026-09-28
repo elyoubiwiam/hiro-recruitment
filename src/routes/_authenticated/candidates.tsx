@@ -13,7 +13,7 @@ import { extractFile } from "@/lib/file-extract";
 import { uid, useStore } from "@/lib/store";
 import type { Candidate } from "@/lib/types";
 
-export const Route = createFileRoute("/candidates")({
+export const Route = createFileRoute("/_authenticated/candidates")({
   head: () => ({
     meta: [
       { title: "Candidates — Talentdesk" },

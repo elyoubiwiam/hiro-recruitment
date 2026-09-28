@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { useStore } from "@/lib/store";
 import { STAGES } from "@/lib/types";
 
-export const Route = createFileRoute("/jobs/$jobId")({
+export const Route = createFileRoute("/_authenticated/jobs/$jobId")({
   head: () => ({
     meta: [
       { title: "Job requisition — Talentdesk" },

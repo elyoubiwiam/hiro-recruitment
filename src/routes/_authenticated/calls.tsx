@@ -11,7 +11,7 @@ import { runAI } from "@/lib/ai.functions";
 import { uid, useStore } from "@/lib/store";
 import type { SynthesisResult } from "@/lib/types";
 
-export const Route = createFileRoute("/calls")({
+export const Route = createFileRoute("/_authenticated/calls")({
   head: () => ({
     meta: [
       { title: "Call Synthesizer — Talentdesk" },
