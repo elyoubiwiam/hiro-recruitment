@@ -1,6 +1,6 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { Briefcase, CalendarCheck, FileSearch, LogOut, MessagesSquare, PhoneCall, ShieldCheck, Users } from "lucide-react";
-import { useEffect, useRef, type ReactNode } from "react";
+import { Briefcase, CalendarCheck, FileSearch, LogOut, MessagesSquare, Moon, PhoneCall, ShieldCheck, Sun, Users } from "lucide-react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { toast } from "sonner";
 import { useStore } from "@/lib/store";
 import { bucketOf } from "@/lib/tracking";
@@ -15,6 +15,20 @@ const NAV = [
 ] as const;
 
 export const PUBLIC = ["/", "/auth", "/reset-password"];
+
+const THEME_KEY = "talentdesk-theme";
+
+function useTheme() {
+  const [dark, setDark] = useState(() => {
+    const saved = localStorage.getItem(THEME_KEY);
+    return saved ? saved === "dark" : true;
+  });
+  useEffect(() => {
+    document.documentElement.classList.toggle("dark", dark);
+    localStorage.setItem(THEME_KEY, dark ? "dark" : "light");
+  }, [dark]);
+  return [dark, setDark] as const;
+}
 
 export function AppShell({ children }: { children: ReactNode }) {
   const path = useRouterState({ select: (s) => s.location.pathname });
