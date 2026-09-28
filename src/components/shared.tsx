@@ -27,7 +27,7 @@ export function CopyButton({ text, label = "Copy" }: { text: string; label?: str
 
 export function GenerateButton({ loading, onClick, children, disabled }: { loading: boolean; onClick: () => void; children: React.ReactNode; disabled?: boolean }) {
   return (
-    <Button onClick={onClick} disabled={loading || disabled} className="bg-accent text-accent-foreground hover:bg-accent/90">
+    <Button onClick={onClick} disabled={loading || disabled} >
       {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
       {children}
     </Button>

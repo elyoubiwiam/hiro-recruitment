@@ -1,8 +1,8 @@
 # Roadmap
 
-- [ ] Accounts: sign-up/login required; each recruiter sees only their own data; owner (Wiam) can see everything
-- [ ] Move data to Lovable Cloud database (owner can browse it)
-- [ ] Per-candidate outreach tracking: steps, status, dates, next-contact date
-- [ ] Personalized draft message for the current step of each candidate
-- [ ] Reminders for next step
-- [ ] Cleaner, original UI redesign
+- [x] Accounts: sign-up/login required; each recruiter sees only their own data; owner can see everything
+- [x] Move data to Lovable Cloud database (owner can browse it)
+- [x] Per-candidate outreach tracking: steps, status, dates, next-contact date
+- [x] Personalized draft message for the current step of each candidate
+- [x] Reminders for next step (in-app only)
+- [x] Cleaner UI redesign ("Focused action cards" direction)

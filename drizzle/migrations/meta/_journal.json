@@ -1,0 +1,13 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1790613517819,
+      "tag": "0000_recruiting_workspace",
+      "breakpoints": true
+    }
+  ]
+}

@@ -8,10 +8,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { runAI } from "@/lib/ai.functions";
-import { uid, useStore } from "@/lib/store";
+import { useStore } from "@/lib/store";
 import type { SynthesisResult } from "@/lib/types";
 
-export const Route = createFileRoute("/calls")({
+export const Route = createFileRoute("/_authenticated/calls")({
   head: () => ({
     meta: [
       { title: "Call Synthesizer — Talentdesk" },
@@ -24,7 +24,7 @@ export const Route = createFileRoute("/calls")({
 });
 
 function Calls() {
-  const { transcripts, candidates, jobs, clients, update } = useStore();
+  const { transcripts, candidates, jobs, clients, updateTranscript, addTranscript } = useStore();
   const [selId, setSelId] = useState<string | "new">(transcripts[0]?.id ?? "new");
   const [loading, setLoading] = useState(false);
   const [draft, setDraft] = useState({ candidateId: "", jobId: "", text: "" });
@@ -34,7 +34,7 @@ function Calls() {
   const text = sel ? sel.text : draft.text;
 
   const patch = (p: Partial<typeof draft>) => {
-    if (sel) update((d) => ({ ...d, transcripts: d.transcripts.map((t) => (t.id === sel.id ? { ...t, ...p } : t)) }));
+    if (sel) updateTranscript(sel.id, p);
     else setDraft({ ...draft, ...p });
   };
 
@@ -49,11 +49,10 @@ function Calls() {
         data: { task: "synthesize", payload: { job, client: clients.find((c) => c.id === job.clientId), candidate: { ...candidate, cv: rawText }, transcript: text } },
       });
       if (sel) {
-        update((d) => ({ ...d, transcripts: d.transcripts.map((t) => (t.id === sel.id ? { ...t, result } : t)) }));
+        await updateTranscript(sel.id, { result });
       } else {
-        const id = uid();
-        update((d) => ({ ...d, transcripts: [{ id, candidateId, jobId, text, title: `Call notes — ${cand.name}`, result, createdAt: new Date().toISOString() }, ...d.transcripts] }));
-        setSelId(id);
+        const id = await addTranscript({ candidateId, jobId, text, title: `Call notes — ${cand.name}`, result });
+        if (id) setSelId(id);
         setDraft({ candidateId: "", jobId: "", text: "" });
       }
     } catch (e) {
@@ -73,7 +72,7 @@ function Calls() {
         <div className="space-y-2">
           <Button variant={selId === "new" ? "default" : "outline"} className="w-full justify-start" onClick={() => setSelId("new")}><Plus className="h-4 w-4" />New call notes</Button>
           {transcripts.map((t) => (
-            <button key={t.id} onClick={() => setSelId(t.id)} className={`w-full rounded-lg border bg-card p-3 text-left text-sm hover:border-primary ${selId === t.id ? "border-primary ring-1 ring-primary" : ""}`}>
+            <button key={t.id} onClick={() => setSelId(t.id)} className={`w-full rounded-xl border bg-card p-3 text-left text-sm hover:border-primary ${selId === t.id ? "border-primary ring-1 ring-primary" : ""}`}>
               <div className="font-semibold">{t.title}</div>
               <div className="text-xs text-muted-foreground">{t.result ? "Synthesized" : "Not yet synthesized"}</div>
             </button>
@@ -81,11 +80,11 @@ function Calls() {
         </div>
 
         <div className="space-y-6">
-          <div className="space-y-4 rounded-lg border bg-card p-5">
+          <div className="space-y-4 rounded-xl border bg-card p-5">
             <CandidateJobPicker candidateId={candidateId || undefined} jobId={jobId || undefined} onCandidate={(v) => patch({ candidateId: v })} onJob={(v) => patch({ jobId: v })} />
             <div className="flex items-center justify-between">
               <span className="text-sm font-medium">Transcript or notes</span>
-              <label className="flex cursor-pointer items-center gap-1 text-xs text-accent">
+              <label className="flex cursor-pointer items-center gap-1 text-xs text-primary">
                 <Upload className="h-3.5 w-3.5" />Upload .txt
                 <Input type="file" accept=".txt,.md,.vtt,.srt" className="hidden" onChange={async (e) => { const f = e.target.files?.[0]; if (f) patch({ text: await f.text() }); }} />
               </label>
@@ -96,9 +95,9 @@ function Calls() {
 
           {r ? (
             <>
-              <section className="rounded-lg border bg-card p-6">
-                <div className="text-xs uppercase tracking-wider text-accent">Executive profile</div>
-                <h2 className="text-3xl">{r.headline}</h2>
+              <section className="rounded-xl border bg-card p-6">
+                <div className="text-xs uppercase tracking-wider text-primary">Executive profile</div>
+                <h2 className="text-2xl">{r.headline}</h2>
                 <p className="mt-3 leading-relaxed">{r.executiveSummary}</p>
                 <div className="mt-5 grid gap-3 sm:grid-cols-2">
                   <div className="rounded-md bg-muted p-4"><div className="flex items-center gap-2 text-xs font-semibold uppercase text-muted-foreground"><DollarSign className="h-3.5 w-3.5" />Compensation</div><div className="mt-1 text-sm">Current: {r.compensation.current}</div><div className="text-sm font-semibold">Expected: {r.compensation.expected}</div></div>
@@ -111,9 +110,9 @@ function Calls() {
                 <h3 className="mb-1 mt-5 text-lg">Culture fit</h3><p className="text-sm text-muted-foreground">{r.cultureFit}</p>
                 {r.concerns.length > 0 && <><h3 className="mb-1 mt-5 text-lg">Watch-outs</h3><ul className="list-disc space-y-1 pl-5 text-sm text-muted-foreground">{r.concerns.map((h, i) => <li key={i}>{h}</li>)}</ul></>}
               </section>
-              <section className="rounded-lg border-2 border-accent/40 bg-card p-6">
+              <section className="rounded-lg border-2 border-primary/30 bg-card p-6">
                 <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
-                  <div className="text-xs uppercase tracking-wider text-accent">Client submission note</div>
+                  <div className="text-xs uppercase tracking-wider text-primary">Client submission note</div>
                   <div className="flex gap-2">
                     <CopyButton text={`Subject: ${r.submissionNote.subject}\n\n${r.submissionNote.body}`} />
                     <Button size="sm" asChild>
