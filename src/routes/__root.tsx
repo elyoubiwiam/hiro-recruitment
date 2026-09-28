@@ -141,7 +141,7 @@ function RootComponent() {
         <AppShell>
           <Outlet />
         </AppShell>
-        <Toaster richColors />
+        <Toaster theme="dark" richColors />
       </StoreProvider>
     </QueryClientProvider>
   );
