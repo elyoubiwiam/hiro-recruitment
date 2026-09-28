@@ -24,7 +24,7 @@ const hrs = (h: number) => new Date(Date.now() + h * 3600000).toISOString();
 function demoSeed(): Data {
   const t = (id: string, candidateId: string, jobId: string, step: number, next: string, history: number[]): Track => ({
     id, candidateId, jobId, step, status: "active", nextContactAt: next,
-    lastContactedAt: history.length ? hrs(-history[history.length - 1]) : null,
+    lastContactedAt: history.length ? hrs(-history[history.length - 1]!) : null,
     history: history.map((h, i) => ({ step: i, sentAt: hrs(-h) })), drafts: {}, notes: "", createdAt: hrs(-240),
   });
   return {
