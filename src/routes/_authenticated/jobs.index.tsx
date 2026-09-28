@@ -55,9 +55,9 @@ function Dashboard() {
           ["Candidates", candidates.length],
           ["In outreach", tracks.filter((t) => t.status === "active").length],
         ].map(([l, v]) => (
-          <div key={l} className="rounded-lg border bg-card p-5">
+          <div key={l} className="rounded-xl border bg-card p-5">
             <div className="text-xs uppercase tracking-wider text-muted-foreground">{l}</div>
-            <div className="mt-1 font-display text-4xl">{v}</div>
+            <div className="mt-1 font-display text-3xl font-bold">{v}</div>
           </div>
         ))}
       </div>
@@ -67,9 +67,9 @@ function Dashboard() {
           <button
             key={c.id}
             onClick={() => setClientFilter(clientFilter === c.id ? "all" : c.id)}
-            className={`rounded-lg border bg-card p-4 text-left transition-colors hover:border-primary ${clientFilter === c.id ? "border-primary ring-1 ring-primary" : ""}`}
+            className={`rounded-xl border bg-card p-4 text-left transition-colors hover:border-primary ${clientFilter === c.id ? "border-primary ring-1 ring-primary" : ""}`}
           >
-            <div className="flex items-center gap-2 font-semibold"><Building2 className="h-4 w-4 text-accent" />{c.name}</div>
+            <div className="flex items-center gap-2 font-semibold"><Building2 className="h-4 w-4 text-primary" />{c.name}</div>
             <div className="text-sm text-muted-foreground">{c.industry}</div>
             <div className="mt-2 text-xs text-muted-foreground">
               {c.contactName} · {jobs.filter((j) => j.clientId === c.id).length} jobs
@@ -100,7 +100,7 @@ function Dashboard() {
                 <div className="space-y-2">
                   {col.map((j) => (
                     <div key={j.id} className="rounded-md border bg-card p-3 shadow-sm">
-                      <Link to="/jobs/$jobId" params={{ jobId: j.id }} className="font-semibold hover:text-accent">{j.title}</Link>
+                      <Link to="/jobs/$jobId" params={{ jobId: j.id }} className="font-semibold hover:text-primary">{j.title}</Link>
                       <div className="text-xs text-muted-foreground">{clientName(j.clientId)}</div>
                       <div className="mt-2 text-xs">{money(j.salaryMin)}–{money(j.salaryMax)}</div>
                       <Select value={j.stage} onValueChange={(v) => setStage(j.id, v as Stage)}>
@@ -115,7 +115,7 @@ function Dashboard() {
           })}
         </div>
       ) : (
-        <div className="overflow-hidden rounded-lg border bg-card">
+        <div className="overflow-hidden rounded-xl border bg-card">
           <table className="w-full text-sm">
             <thead className="bg-muted/60 text-left text-xs uppercase tracking-wider text-muted-foreground">
               <tr><th className="p-3">Role</th><th className="p-3">Client</th><th className="p-3">Location</th><th className="p-3">Salary</th><th className="p-3">Stage</th></tr>
@@ -123,7 +123,7 @@ function Dashboard() {
             <tbody>
               {shown.map((j) => (
                 <tr key={j.id} className="border-t">
-                  <td className="p-3"><Link to="/jobs/$jobId" params={{ jobId: j.id }} className="font-semibold hover:text-accent">{j.title}</Link><div className="text-xs text-muted-foreground">{j.department}</div></td>
+                  <td className="p-3"><Link to="/jobs/$jobId" params={{ jobId: j.id }} className="font-semibold hover:text-primary">{j.title}</Link><div className="text-xs text-muted-foreground">{j.department}</div></td>
                   <td className="p-3">{clientName(j.clientId)}</td>
                   <td className="p-3"><span className="flex items-center gap-1"><MapPin className="h-3 w-3" />{j.location}</span><span className="text-xs text-muted-foreground">{j.workMode}</span></td>
                   <td className="p-3">{money(j.salaryMin)}–{money(j.salaryMax)}</td>

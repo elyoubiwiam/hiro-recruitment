@@ -33,8 +33,8 @@ function JobPage() {
       <Link to="/jobs" className="mb-4 inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"><ArrowLeft className="h-4 w-4" />All jobs</Link>
       <div className="mb-6 flex flex-wrap items-start justify-between gap-4">
         <div>
-          <div className="text-sm text-accent">{client?.name} · {job.department}</div>
-          <h1 className="text-4xl">{job.title}</h1>
+          <div className="text-sm text-primary">{client?.name} · {job.department}</div>
+          <h1 className="text-3xl font-bold">{job.title}</h1>
           <div className="mt-2 flex flex-wrap gap-3 text-sm text-muted-foreground">
             <span className="flex items-center gap-1"><MapPin className="h-4 w-4" />{job.location} · {job.workMode}</span>
             <span>{money(job.salaryMin)}–{money(job.salaryMax)}</span>
@@ -44,13 +44,13 @@ function JobPage() {
       </div>
       <div className="grid gap-6 lg:grid-cols-3">
         <div className="space-y-6 lg:col-span-1">
-          <section className="rounded-lg border bg-card p-5">
+          <section className="rounded-xl border bg-card p-5">
             <h3 className="mb-3 text-lg">Must-haves</h3>
             <div className="flex flex-wrap gap-2">{job.mustHave.map((s) => <Badge key={s}>{s}</Badge>)}</div>
             <h3 className="mb-3 mt-5 text-lg">Soft factors</h3>
             <div className="flex flex-wrap gap-2">{job.softFactors.map((s) => <Badge key={s} variant="outline">{s}</Badge>)}</div>
           </section>
-          <section className="rounded-lg border bg-card p-5">
+          <section className="rounded-xl border bg-card p-5">
             <h3 className="mb-2 text-lg">Description</h3>
             <p className="whitespace-pre-wrap text-sm leading-relaxed text-muted-foreground">{job.description}</p>
           </section>
@@ -59,7 +59,7 @@ function JobPage() {
           <h2 className="mb-3 text-2xl">Candidates</h2>
           <div className="space-y-2">
             {ranked.map(({ c, m }) => (
-              <div key={c.id} className="flex flex-wrap items-center justify-between gap-3 rounded-lg border bg-card p-4">
+              <div key={c.id} className="flex flex-wrap items-center justify-between gap-3 rounded-xl border bg-card p-4">
                 <div className="flex items-center gap-4">
                   <div className={`w-14 text-center font-display text-2xl ${m ? scoreTone(m.result.score) : "text-muted-foreground"}`}>{m ? `${m.result.score}%` : "—"}</div>
                   <div><div className="font-semibold">{c.name}</div><div className="text-sm text-muted-foreground">{c.headline}</div></div>

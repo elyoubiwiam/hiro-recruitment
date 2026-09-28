@@ -16,7 +16,7 @@ const NAV = [
   { to: "/calls", label: "Call Synthesizer", icon: PhoneCall },
 ] as const;
 
-const PUBLIC = ["/", "/auth", "/reset-password"];
+export const PUBLIC = ["/", "/auth", "/reset-password"];
 
 export function AppShell({ children }: { children: ReactNode }) {
   const path = useRouterState({ select: (s) => s.location.pathname });

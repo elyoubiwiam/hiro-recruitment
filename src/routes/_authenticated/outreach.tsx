@@ -57,7 +57,7 @@ function Outreach() {
   return (
     <>
       <PageHeader title="Outreach Generator" subtitle="Multi-step sequences that explain why this person fits this role." />
-      <div className="mb-8 space-y-4 rounded-lg border bg-card p-5">
+      <div className="mb-8 space-y-4 rounded-xl border bg-card p-5">
         <CandidateJobPicker
           candidateId={search.candidate} jobId={search.job}
           onCandidate={(v) => { setResult(null); navigate({ search: (s) => ({ ...s, candidate: v }) }); }}
@@ -79,11 +79,11 @@ function Outreach() {
       {!result ? (
         <EmptyState text={loading ? "Writing a personalised sequence…" : "Pick a candidate and a job to generate outreach."} />
       ) : (
-        <ol className="relative space-y-5 border-l-2 border-accent/40 pl-8">
+        <ol className="relative space-y-5 border-l-2 border-primary/30 pl-8">
           {steps.map((s, i) => (
             <li key={i} className="relative">
-              <span className="absolute -left-[45px] flex h-8 w-8 items-center justify-center rounded-full bg-accent text-accent-foreground"><s.icon className="h-4 w-4" /></span>
-              <div className="rounded-lg border bg-card p-5">
+              <span className="absolute -left-[45px] flex h-8 w-8 items-center justify-center rounded-full bg-accent text-primary-foreground"><s.icon className="h-4 w-4" /></span>
+              <div className="rounded-xl border bg-card p-5">
                 <div className="mb-2 flex items-center justify-between gap-2">
                   <div className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{s.label}</div>
                   <CopyButton text={s.subject ? `Subject: ${s.subject}\n\n${s.body}` : s.body} />

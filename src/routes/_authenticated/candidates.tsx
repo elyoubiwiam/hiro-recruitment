@@ -66,16 +66,16 @@ function CandidatesPage() {
   return (
     <>
       <PageHeader title="Candidates" subtitle="Drop in a CV — AI turns it into a structured profile." />
-      <div className="mb-8 rounded-lg border bg-card p-5">
+      <div className="mb-8 rounded-xl border bg-card p-5">
         <Tabs defaultValue="upload">
           <TabsList><TabsTrigger value="upload">Upload file</TabsTrigger><TabsTrigger value="paste">Paste text</TabsTrigger></TabsList>
           <TabsContent value="upload">
             <label
               onDragOver={(e) => e.preventDefault()}
               onDrop={(e) => { e.preventDefault(); onFile(e.dataTransfer.files[0]); }}
-              className="mt-3 flex cursor-pointer flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed p-10 text-center hover:border-accent"
+              className="mt-3 flex cursor-pointer flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed p-10 text-center hover:border-primary"
             >
-              <Upload className="h-6 w-6 text-accent" />
+              <Upload className="h-6 w-6 text-primary" />
               <div className="font-semibold">{loading ? "Parsing CV…" : "Drop a CV here or click to browse"}</div>
               <div className="text-xs text-muted-foreground">PDF, Word (.docx) or .txt</div>
               <input ref={fileRef} type="file" accept=".pdf,.docx,.txt,.md" className="hidden" disabled={loading} onChange={(e) => onFile(e.target.files?.[0])} />
@@ -92,18 +92,18 @@ function CandidatesPage() {
         <div className="space-y-2">
           {candidates.map((c) => (
             <button key={c.id} onClick={() => setSelected(c.id)}
-              className={`w-full rounded-lg border bg-card p-3 text-left hover:border-primary ${current?.id === c.id ? "border-primary ring-1 ring-primary" : ""}`}>
+              className={`w-full rounded-xl border bg-card p-3 text-left hover:border-primary ${current?.id === c.id ? "border-primary ring-1 ring-primary" : ""}`}>
               <div className="font-semibold">{c.name}</div>
               <div className="truncate text-sm text-muted-foreground">{c.headline}</div>
             </button>
           ))}
         </div>
         {current ? (
-          <div className="rounded-lg border bg-card p-6">
+          <div className="rounded-xl border bg-card p-6">
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div>
-                <h2 className="text-3xl">{current.name}</h2>
-                <div className="text-accent">{current.headline}</div>
+                <h2 className="text-2xl">{current.name}</h2>
+                <div className="text-primary">{current.headline}</div>
                 <div className="mt-2 flex flex-wrap gap-4 text-sm text-muted-foreground">
                   {current.location && <span className="flex items-center gap-1"><MapPin className="h-3.5 w-3.5" />{current.location}</span>}
                   {current.email && <span className="flex items-center gap-1"><Mail className="h-3.5 w-3.5" />{current.email}</span>}
@@ -132,7 +132,7 @@ function CandidatesPage() {
             </ol>
             <h3 className="mb-2 mt-6 text-xl">Education</h3>
             {current.education.map((e, i) => (
-              <div key={i} className="flex items-center gap-2 text-sm"><GraduationCap className="h-4 w-4 text-accent" />{e.degree}, {e.school} {e.year && `(${e.year})`}</div>
+              <div key={i} className="flex items-center gap-2 text-sm"><GraduationCap className="h-4 w-4 text-primary" />{e.degree}, {e.school} {e.year && `(${e.year})`}</div>
             ))}
           </div>
         ) : <EmptyState text="Select or upload a candidate." />}
