@@ -19,7 +19,7 @@ export const PUBLIC = ["/", "/auth", "/reset-password"];
 const THEME_KEY = "talentdesk-theme";
 
 function useTheme() {
-  const [dark, setDark] = useState(true);
+  const [dark, setDark] = useState(false);
   useEffect(() => {
     const saved = localStorage.getItem(THEME_KEY);
     if (saved) setDark(saved === "dark");
