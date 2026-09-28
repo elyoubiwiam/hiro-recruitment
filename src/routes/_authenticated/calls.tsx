@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { runAI } from "@/lib/ai.functions";
-import { uid, useStore } from "@/lib/store";
+import { useStore } from "@/lib/store";
 import type { SynthesisResult } from "@/lib/types";
 
 export const Route = createFileRoute("/_authenticated/calls")({
@@ -24,7 +24,7 @@ export const Route = createFileRoute("/_authenticated/calls")({
 });
 
 function Calls() {
-  const { transcripts, candidates, jobs, clients, update } = useStore();
+  const { transcripts, candidates, jobs, clients, updateTranscript, addTranscript } = useStore();
   const [selId, setSelId] = useState<string | "new">(transcripts[0]?.id ?? "new");
   const [loading, setLoading] = useState(false);
   const [draft, setDraft] = useState({ candidateId: "", jobId: "", text: "" });
@@ -34,7 +34,7 @@ function Calls() {
   const text = sel ? sel.text : draft.text;
 
   const patch = (p: Partial<typeof draft>) => {
-    if (sel) update((d) => ({ ...d, transcripts: d.transcripts.map((t) => (t.id === sel.id ? { ...t, ...p } : t)) }));
+    if (sel) updateTranscript(sel.id, p);
     else setDraft({ ...draft, ...p });
   };
 
@@ -49,11 +49,10 @@ function Calls() {
         data: { task: "synthesize", payload: { job, client: clients.find((c) => c.id === job.clientId), candidate: { ...candidate, cv: rawText }, transcript: text } },
       });
       if (sel) {
-        update((d) => ({ ...d, transcripts: d.transcripts.map((t) => (t.id === sel.id ? { ...t, result } : t)) }));
+        await updateTranscript(sel.id, { result });
       } else {
-        const id = uid();
-        update((d) => ({ ...d, transcripts: [{ id, candidateId, jobId, text, title: `Call notes — ${cand.name}`, result, createdAt: new Date().toISOString() }, ...d.transcripts] }));
-        setSelId(id);
+        const id = await addTranscript({ candidateId, jobId, text, title: `Call notes — ${cand.name}`, result });
+        if (id) setSelId(id);
         setDraft({ candidateId: "", jobId: "", text: "" });
       }
     } catch (e) {

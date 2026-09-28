@@ -10,8 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { runAI } from "@/lib/ai.functions";
 import { extractFile } from "@/lib/file-extract";
-import { uid, useStore } from "@/lib/store";
-import type { Candidate } from "@/lib/types";
+import { useStore } from "@/lib/store";
 
 export const Route = createFileRoute("/_authenticated/candidates")({
   head: () => ({
@@ -26,7 +25,7 @@ export const Route = createFileRoute("/_authenticated/candidates")({
 });
 
 function CandidatesPage() {
-  const { candidates, update } = useStore();
+  const { candidates, addCandidate, deleteCandidate } = useStore();
   const [selected, setSelected] = useState<string | undefined>(candidates[0]?.id);
   const [text, setText] = useState("");
   const [loading, setLoading] = useState(false);
@@ -37,13 +36,13 @@ function CandidatesPage() {
     setLoading(true);
     try {
       const r = await runAI({ data: { task: "parse_cv", payload } });
-      const cand: Candidate = {
-        id: uid(), name: r.name || "Unnamed candidate", email: r.email || "", phone: r.phone || "",
+      const cand = await addCandidate({
+        name: r.name || "Unnamed candidate", email: r.email || "", phone: r.phone || "",
         location: r.location || "", headline: r.headline || "", summary: r.summary || "",
         skills: r.skills || [], experience: r.experience || [], education: r.education || [],
-        rawText: payload.text || r.rawText || "", createdAt: new Date().toISOString(),
-      };
-      update((d) => ({ ...d, candidates: [cand, ...d.candidates] }));
+        rawText: payload.text || r.rawText || "",
+      });
+      if (!cand) return;
       setSelected(cand.id);
       setText("");
       toast.success(`Parsed ${cand.name}`);
@@ -114,7 +113,7 @@ function CandidatesPage() {
               <div className="flex gap-2">
                 <Button asChild size="sm"><Link to="/screening" search={{ candidate: current.id }}><FileSearch className="h-4 w-4" />Match to job</Link></Button>
                 <Button size="sm" variant="ghost" onClick={() => {
-                  update((d) => ({ ...d, candidates: d.candidates.filter((c) => c.id !== current.id) }));
+                  deleteCandidate(current.id);
                   setSelected(undefined);
                 }}><Trash2 className="h-4 w-4" /></Button>
               </div>

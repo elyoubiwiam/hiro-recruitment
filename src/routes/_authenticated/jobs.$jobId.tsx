@@ -30,7 +30,7 @@ function JobPage() {
 
   return (
     <div>
-      <Link to="/" className="mb-4 inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"><ArrowLeft className="h-4 w-4" />All jobs</Link>
+      <Link to="/jobs" className="mb-4 inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"><ArrowLeft className="h-4 w-4" />All jobs</Link>
       <div className="mb-6 flex flex-wrap items-start justify-between gap-4">
         <div>
           <div className="text-sm text-accent">{client?.name} · {job.department}</div>

@@ -11,7 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { uid, useStore } from "@/lib/store";
+import { useStore } from "@/lib/store";
 import { STAGES, type Job, type Stage } from "@/lib/types";
 
 export const Route = createFileRoute("/_authenticated/jobs/")({
@@ -27,13 +27,13 @@ export const Route = createFileRoute("/_authenticated/jobs/")({
 });
 
 function Dashboard() {
-  const { clients, jobs, candidates, transcripts, update } = useStore();
+  const { clients, jobs, candidates, tracks, updateJob } = useStore();
   const [view, setView] = useState<"list" | "pipeline">("pipeline");
   const [clientFilter, setClientFilter] = useState<string>("all");
   const shown = jobs.filter((j) => clientFilter === "all" || j.clientId === clientFilter);
   const clientName = (id: string) => clients.find((c) => c.id === id)?.name ?? "—";
   const setStage = (id: string, stage: Stage) =>
-    update((d) => ({ ...d, jobs: d.jobs.map((j) => (j.id === id ? { ...j, stage } : j)) }));
+    updateJob(id, { stage });
 
   return (
     <>
@@ -53,7 +53,7 @@ function Dashboard() {
           ["Active clients", clients.length],
           ["Open jobs", jobs.filter((j) => j.stage !== "filled").length],
           ["Candidates", candidates.length],
-          ["Call notes", transcripts.length],
+          ["In outreach", tracks.filter((t) => t.status === "active").length],
         ].map(([l, v]) => (
           <div key={l} className="rounded-lg border bg-card p-5">
             <div className="text-xs uppercase tracking-wider text-muted-foreground">{l}</div>
@@ -139,7 +139,7 @@ function Dashboard() {
 }
 
 function NewClientDialog() {
-  const { update } = useStore();
+  const { addClient } = useStore();
   const [open, setOpen] = useState(false);
   const [f, setF] = useState({ name: "", industry: "", contactName: "", contactEmail: "" });
   return (
@@ -153,7 +153,7 @@ function NewClientDialog() {
               <Input value={f[k]} onChange={(e) => setF({ ...f, [k]: e.target.value })} /></div>
           ))}
           <Button disabled={!f.name} onClick={() => {
-            update((d) => ({ ...d, clients: [...d.clients, { id: uid(), ...f }] }));
+            addClient(f);
             setOpen(false); setF({ name: "", industry: "", contactName: "", contactEmail: "" });
             toast.success("Client added");
           }}>Save client</Button>
@@ -164,7 +164,7 @@ function NewClientDialog() {
 }
 
 function NewJobDialog() {
-  const { clients, update } = useStore();
+  const { clients, addJob } = useStore();
   const [open, setOpen] = useState(false);
   const blank = { clientId: "", title: "", department: "", salaryMin: "", salaryMax: "", location: "", workMode: "Hybrid", mustHave: "", softFactors: "", description: "" };
   const [f, setF] = useState(blank);
@@ -195,13 +195,13 @@ function NewJobDialog() {
           <div className="space-y-1 sm:col-span-2"><Label>Job description</Label><Textarea rows={5} value={f.description} onChange={set("description")} /></div>
           <Button className="sm:col-span-2" disabled={!f.title || !f.clientId} onClick={() => {
             const split = (s: string) => s.split(",").map((x) => x.trim()).filter(Boolean);
-            const job: Job = {
-              id: uid(), clientId: f.clientId, title: f.title, department: f.department, location: f.location,
+            const job: Omit<Job, "id" | "createdAt"> = {
+              clientId: f.clientId, title: f.title, department: f.department, location: f.location,
               salaryMin: Number(f.salaryMin) || 0, salaryMax: Number(f.salaryMax) || 0, currency: "USD",
               workMode: f.workMode as Job["workMode"], mustHave: split(f.mustHave), softFactors: split(f.softFactors),
-              description: f.description, stage: "intake", createdAt: new Date().toISOString(),
+              description: f.description, stage: "intake",
             };
-            update((d) => ({ ...d, jobs: [...d.jobs, job] }));
+            addJob(job);
             setOpen(false); setF(blank); toast.success("Job created");
           }}>Create job</Button>
         </div>

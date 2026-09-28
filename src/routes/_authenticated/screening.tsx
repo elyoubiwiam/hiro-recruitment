@@ -26,7 +26,7 @@ export const Route = createFileRoute("/_authenticated/screening")({
 function Screening() {
   const search = Route.useSearch();
   const navigate = useNavigate({ from: "/screening" });
-  const { candidates, jobs, clients, matches, update } = useStore();
+  const { candidates, jobs, clients, matches, saveMatch } = useStore();
   const [loading, setLoading] = useState(false);
   const cand = candidates.find((c) => c.id === search.candidate);
   const job = jobs.find((j) => j.id === search.job);
@@ -40,10 +40,7 @@ function Screening() {
       const result: MatchResult = await runAI({
         data: { task: "match", payload: { job, client: clients.find((c) => c.id === job.clientId), candidate: { ...candidate, cv: rawText } } },
       });
-      update((d) => ({
-        ...d,
-        matches: [...d.matches.filter((m) => !(m.candidateId === cand.id && m.jobId === job.id)), { candidateId: cand.id, jobId: job.id, result, createdAt: new Date().toISOString() }],
-      }));
+      await saveMatch(cand.id, job.id, result);
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Scoring failed");
     } finally {
