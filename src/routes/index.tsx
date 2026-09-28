@@ -42,7 +42,7 @@ function Landing() {
           </div>
           <span className="text-lg font-bold tracking-tight">Talentdesk</span>
         </div>
-        <Button asChild variant="outline"><Link to="/auth">Sign in</Link></Button>
+        <Button asChild variant="outline"><Link to="/today">Open workspace</Link></Button>
       </header>
       <section className="mx-auto max-w-5xl px-6 pb-20 pt-16">
         <span className="inline-flex items-center gap-1.5 rounded-full bg-accent px-3 py-1 text-xs font-semibold text-accent-foreground">
@@ -52,7 +52,7 @@ function Landing() {
         <p className="mt-4 max-w-xl text-lg text-muted-foreground">
           Talentdesk tracks every step of your candidate outreach and prepares a personalized message for the next one.
         </p>
-        <Button asChild size="lg" className="mt-8"><Link to="/auth">Create your workspace <ArrowRight className="h-4 w-4" /></Link></Button>
+        <Button asChild size="lg" className="mt-8"><Link to="/today">Open the workspace <ArrowRight className="h-4 w-4" /></Link></Button>
         <div className="mt-16 grid gap-4 sm:grid-cols-2">
           {features.map((f) => (
             <div key={f.title} className="rounded-2xl border bg-card p-6">
