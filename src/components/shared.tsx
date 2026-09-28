@@ -36,13 +36,13 @@ export function GenerateButton({ loading, onClick, children, disabled }: { loadi
 
 export function CandidateJobPicker({
   candidateId, jobId, onCandidate, onJob,
-}: { candidateId?: string; jobId?: string; onCandidate: (v: string) => void; onJob: (v: string) => void }) {
+}: { candidateId?: string | undefined; jobId?: string | undefined; onCandidate: (v: string) => void; onJob: (v: string) => void }) {
   const { candidates, jobs, clients } = useStore();
   return (
     <div className="grid gap-4 sm:grid-cols-2">
       <div className="space-y-1.5">
         <Label>Candidate</Label>
-        <Select value={candidateId} onValueChange={onCandidate}>
+        <Select value={candidateId ?? ""} onValueChange={onCandidate}>
           <SelectTrigger className="bg-card"><SelectValue placeholder="Select a candidate" /></SelectTrigger>
           <SelectContent>
             {candidates.map((c) => (
@@ -53,7 +53,7 @@ export function CandidateJobPicker({
       </div>
       <div className="space-y-1.5">
         <Label>Job</Label>
-        <Select value={jobId} onValueChange={onJob}>
+        <Select value={jobId ?? ""} onValueChange={onJob}>
           <SelectTrigger className="bg-card"><SelectValue placeholder="Select a job" /></SelectTrigger>
           <SelectContent>
             {jobs.filter((j) => j.stage !== "filled").map((j) => (
