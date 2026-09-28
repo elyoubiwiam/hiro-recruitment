@@ -1,9 +1,7 @@
-import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
+import { Link, useRouterState } from "@tanstack/react-router";
 import { Briefcase, CalendarCheck, FileSearch, LogOut, MessagesSquare, PhoneCall, ShieldCheck, Users } from "lucide-react";
 import { useEffect, useRef, type ReactNode } from "react";
 import { toast } from "sonner";
-import { useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import { useStore } from "@/lib/store";
 import { bucketOf } from "@/lib/tracking";
 
@@ -21,8 +19,6 @@ export const PUBLIC = ["/", "/auth", "/reset-password"];
 export function AppShell({ children }: { children: ReactNode }) {
   const path = useRouterState({ select: (s) => s.location.pathname });
   const { tracks, email, isAdmin, loading } = useStore();
-  const navigate = useNavigate();
-  const qc = useQueryClient();
   const due = tracks.filter((t) => ["overdue", "today"].includes(bucketOf(t))).length;
   const reminded = useRef(false);
 
