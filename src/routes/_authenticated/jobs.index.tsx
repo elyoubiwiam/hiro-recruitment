@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
-import { Building2, LayoutGrid, List, MapPin, Plus } from "lucide-react";
+import { ArrowDown, ArrowUp, ArrowUpDown, Building2, ChevronRight, LayoutGrid, List, MapPin, Plus } from "lucide-react";
 import { toast } from "sonner";
 import { PageHeader } from "@/components/AppShell";
 import { money } from "@/components/shared";
@@ -30,8 +30,34 @@ function Dashboard() {
   const { clients, jobs, candidates, tracks, updateJob } = useStore();
   const [view, setView] = useState<"list" | "pipeline">("pipeline");
   const [clientFilter, setClientFilter] = useState<string>("all");
-  const shown = jobs.filter((j) => clientFilter === "all" || j.clientId === clientFilter);
+  const [openOnly, setOpenOnly] = useState(false);
+  const [sort, setSort] = useState<{ key: SortKey; dir: 1 | -1 } | null>(null);
   const clientName = (id: string) => clients.find((c) => c.id === id)?.name ?? "—";
+  const stageIdx = (s: Stage) => STAGES.findIndex((x) => x.id === s);
+  const shown = jobs
+    .filter((j) => clientFilter === "all" || j.clientId === clientFilter)
+    .filter((j) => !openOnly || j.stage !== "filled")
+    .sort((a, b) => {
+      if (!sort) return 0;
+      const v = (j: Job): string | number =>
+        sort.key === "title" ? j.title.toLowerCase()
+        : sort.key === "client" ? clientName(j.clientId).toLowerCase()
+        : sort.key === "location" ? j.location.toLowerCase()
+        : sort.key === "salary" ? Number(j.salaryMin) || 0
+        : stageIdx(j.stage);
+      const x = v(a), y = v(b);
+      return (x < y ? -1 : x > y ? 1 : 0) * sort.dir;
+    });
+  const toggleSort = (key: SortKey) =>
+    setSort((s) => (s?.key === key ? (s.dir === 1 ? { key, dir: -1 } : null) : { key, dir: 1 }));
+  const SortTh = ({ k, label }: { k: SortKey; label: string }) => (
+    <th className="p-0">
+      <button onClick={() => toggleSort(k)} className="flex w-full items-center gap-1 p-3 uppercase tracking-wider transition-colors hover:text-foreground">
+        {label}
+        {sort?.key === k ? (sort.dir === 1 ? <ArrowUp className="h-3 w-3 text-primary" /> : <ArrowDown className="h-3 w-3 text-primary" />) : <ArrowUpDown className="h-3 w-3 opacity-40" />}
+      </button>
+    </th>
+  );
   const setStage = (id: string, stage: Stage) =>
     updateJob(id, { stage });
 
@@ -49,17 +75,18 @@ function Dashboard() {
       />
 
       <div className="mb-8 grid grid-cols-2 gap-4 lg:grid-cols-4">
-        {[
-          ["Active clients", clients.length],
-          ["Open jobs", jobs.filter((j) => j.stage !== "filled").length],
-          ["Candidates", candidates.length],
-          ["In outreach", tracks.filter((t) => t.status === "active").length],
-        ].map(([l, v]) => (
-          <div key={l} className="rounded-xl border bg-card p-5">
-            <div className="text-xs uppercase tracking-wider text-muted-foreground">{l}</div>
-            <div className="mt-1 font-display text-3xl font-bold">{v}</div>
-          </div>
-        ))}
+        <button onClick={() => { setClientFilter("all"); setOpenOnly(false); }} className={`group relative rounded-xl border bg-card p-5 text-left transition-all hover:-translate-y-0.5 hover:border-primary hover:shadow-lg hover:shadow-primary/10 cursor-pointer ${!openOnly && clientFilter === "all" ? "border-primary ring-1 ring-primary" : ""}`}>
+          <StatInner label="All clients & jobs" value={clients.length} />
+        </button>
+        <button onClick={() => { setOpenOnly(!openOnly); setView("list"); }} className={`group relative rounded-xl border bg-card p-5 text-left transition-all hover:-translate-y-0.5 hover:border-primary hover:shadow-lg hover:shadow-primary/10 cursor-pointer ${openOnly ? "border-primary ring-1 ring-primary" : ""}`}>
+          <StatInner label="Open jobs" value={jobs.filter((j) => j.stage !== "filled").length} />
+        </button>
+        <Link to="/candidates" className="group relative rounded-xl border bg-card p-5 text-left transition-all hover:-translate-y-0.5 hover:border-primary hover:shadow-lg hover:shadow-primary/10 cursor-pointer">
+          <StatInner label="Candidates" value={candidates.length} />
+        </Link>
+        <Link to="/today" className="group relative rounded-xl border bg-card p-5 text-left transition-all hover:-translate-y-0.5 hover:border-primary hover:shadow-lg hover:shadow-primary/10 cursor-pointer">
+          <StatInner label="In outreach" value={tracks.filter((t) => t.status === "active").length} />
+        </Link>
       </div>
 
       <div className="mb-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
@@ -67,8 +94,9 @@ function Dashboard() {
           <button
             key={c.id}
             onClick={() => setClientFilter(clientFilter === c.id ? "all" : c.id)}
-            className={`rounded-xl border bg-card p-4 text-left transition-colors hover:border-primary ${clientFilter === c.id ? "border-primary ring-1 ring-primary" : ""}`}
+            className={`group relative cursor-pointer rounded-xl border bg-card p-4 text-left transition-all hover:-translate-y-0.5 hover:border-primary hover:shadow-lg hover:shadow-primary/10 ${clientFilter === c.id ? "border-primary ring-1 ring-primary" : ""}`}
           >
+            <ChevronRight className="absolute right-3 top-4 h-4 w-4 text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100" />
             <div className="flex items-center gap-2 font-semibold"><Building2 className="h-4 w-4 text-primary" />{c.name}</div>
             <div className="text-sm text-muted-foreground">{c.industry}</div>
             <div className="mt-2 text-xs text-muted-foreground">
@@ -80,7 +108,7 @@ function Dashboard() {
 
       <div className="mb-4 flex items-center justify-between">
         <h2 className="text-2xl">
-          Requisitions {clientFilter !== "all" && <span className="text-muted-foreground">· {clientName(clientFilter)}</span>}
+          Requisitions {openOnly && <span className="text-muted-foreground">· open</span>} {clientFilter !== "all" && <span className="text-muted-foreground">· {clientName(clientFilter)}</span>}
         </h2>
         <div className="flex rounded-md border bg-card p-0.5">
           <Button size="sm" variant={view === "pipeline" ? "default" : "ghost"} onClick={() => setView("pipeline")}><LayoutGrid className="h-4 w-4" />Pipeline</Button>
@@ -118,22 +146,39 @@ function Dashboard() {
         <div className="overflow-hidden rounded-xl border bg-card">
           <table className="w-full text-sm">
             <thead className="bg-muted/60 text-left text-xs uppercase tracking-wider text-muted-foreground">
-              <tr><th className="p-3">Role</th><th className="p-3">Client</th><th className="p-3">Location</th><th className="p-3">Salary</th><th className="p-3">Stage</th></tr>
+              <tr><SortTh k="title" label="Role" /><SortTh k="client" label="Client" /><SortTh k="location" label="Location" /><SortTh k="salary" label="Salary" /><SortTh k="stage" label="Stage" /></tr>
             </thead>
             <tbody>
               {shown.map((j) => (
-                <tr key={j.id} className="border-t">
+                <tr key={j.id} className="border-t transition-colors hover:bg-muted/40">
                   <td className="p-3"><Link to="/jobs/$jobId" params={{ jobId: j.id }} className="font-semibold hover:text-primary">{j.title}</Link><div className="text-xs text-muted-foreground">{j.department}</div></td>
                   <td className="p-3">{clientName(j.clientId)}</td>
                   <td className="p-3"><span className="flex items-center gap-1"><MapPin className="h-3 w-3" />{j.location}</span><span className="text-xs text-muted-foreground">{j.workMode}</span></td>
                   <td className="p-3">{money(j.salaryMin)}–{money(j.salaryMax)}</td>
-                  <td className="p-3"><Badge variant="secondary">{STAGES.find((s) => s.id === j.stage)?.label}</Badge></td>
+                  <td className="p-3">
+                    <Select value={j.stage} onValueChange={(v) => setStage(j.id, v as Stage)}>
+                      <SelectTrigger className="h-8 w-36 text-xs"><SelectValue /></SelectTrigger>
+                      <SelectContent>{STAGES.map((x) => <SelectItem key={x.id} value={x.id}>{x.label}</SelectItem>)}</SelectContent>
+                    </Select>
+                  </td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
       )}
+    </>
+  );
+}
+
+type SortKey = "title" | "client" | "location" | "salary" | "stage";
+
+function StatInner({ label, value }: { label: string; value: number }) {
+  return (
+    <>
+      <ChevronRight className="absolute right-3 top-4 h-4 w-4 text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100" />
+      <div className="text-xs uppercase tracking-wider text-muted-foreground">{label}</div>
+      <div className="mt-1 font-display text-3xl font-bold group-hover:text-primary">{value}</div>
     </>
   );
 }

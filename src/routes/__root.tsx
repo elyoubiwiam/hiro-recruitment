@@ -114,7 +114,7 @@ function RootShell({ children }: { children: ReactNode }) {
       <head>
         <script
           dangerouslySetInnerHTML={{
-            __html: `try{var t=localStorage.getItem("talentdesk-theme");if(t!=="light")document.documentElement.classList.add("dark")}catch(e){document.documentElement.classList.add("dark")}`,
+            __html: `try{var t=localStorage.getItem("talentdesk-theme");if(t==="dark")document.documentElement.classList.add("dark")}catch(e){}`,
           }}
         />
         <HeadContent />
@@ -138,7 +138,7 @@ function RootComponent() {
     return () => data.subscription.unsubscribe();
   }, [router]);
 
-  const [theme, setTheme] = useState<"dark" | "light">("dark");
+  const [theme, setTheme] = useState<"dark" | "light">("light");
   useEffect(() => {
     const update = () => setTheme(document.documentElement.classList.contains("dark") ? "dark" : "light");
     update();
