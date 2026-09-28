@@ -1,7 +1,8 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { z } from "zod";
-import { Linkedin, Mail, Send } from "lucide-react";
+import { CalendarPlus, Linkedin, Mail, Send } from "lucide-react";
 import { toast } from "sonner";
 import { PageHeader } from "@/components/AppShell";
 import { CandidateJobPicker, CopyButton, EmptyState, GenerateButton } from "@/components/shared";
@@ -25,7 +26,8 @@ export const Route = createFileRoute("/_authenticated/outreach")({
 function Outreach() {
   const search = Route.useSearch();
   const navigate = useNavigate({ from: "/outreach" });
-  const { candidates, jobs, clients } = useStore();
+  const { candidates, jobs, clients, tracks, startTrack } = useStore();
+  const tracked = tracks.find((t) => t.candidateId === search.candidate && t.jobId === search.job);
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<OutreachResult | null>(null);
   const cand = candidates.find((c) => c.id === search.candidate);
@@ -61,7 +63,18 @@ function Outreach() {
           onCandidate={(v) => { setResult(null); navigate({ search: (s) => ({ ...s, candidate: v }) }); }}
           onJob={(v) => { setResult(null); navigate({ search: (s) => ({ ...s, job: v }) }); }}
         />
-        <GenerateButton loading={loading} disabled={!cand || !job} onClick={run}>{result ? "Regenerate sequence" : "Generate sequence"}</GenerateButton>
+        <div className="flex flex-wrap items-center gap-3">
+          <GenerateButton loading={loading} disabled={!cand || !job} onClick={run}>{result ? "Regenerate sequence" : "Generate sequence"}</GenerateButton>
+          {result && (
+            <Button variant="outline" onClick={async () => {
+              const drafts: Record<string, { subject?: string; body: string }> = { "0": { body: result.linkedinConnect }, "1": result.inmail };
+              result.emails.slice(0, 3).forEach((e, i) => { drafts[String(i + 2)] = { subject: e.subject, body: e.body }; });
+              const r = await startTrack(cand!.id, job!.id, drafts);
+              if (r) toast.success(tracked ? "Tracker drafts updated" : "Added to Today — step 1 is due now");
+            }}><CalendarPlus className="h-4 w-4" />{tracked ? "Update tracker drafts" : "Track this sequence"}</Button>
+          )}
+          {tracked && <Link to="/today" className="text-sm font-medium text-primary hover:underline">In tracker · step {tracked.step + 1}</Link>}
+        </div>
       </div>
       {!result ? (
         <EmptyState text={loading ? "Writing a personalised sequence…" : "Pick a candidate and a job to generate outreach."} />

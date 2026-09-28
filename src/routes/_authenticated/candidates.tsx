@@ -30,7 +30,7 @@ function CandidatesPage() {
   const [text, setText] = useState("");
   const [loading, setLoading] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
-  const current = candidates.find((c) => c.id === selected);
+  const current = candidates.find((c) => c.id === selected) ?? candidates[0];
 
   async function parse(payload: { text?: string; fileData?: string; filename?: string }) {
     setLoading(true);
@@ -92,7 +92,7 @@ function CandidatesPage() {
         <div className="space-y-2">
           {candidates.map((c) => (
             <button key={c.id} onClick={() => setSelected(c.id)}
-              className={`w-full rounded-lg border bg-card p-3 text-left hover:border-primary ${selected === c.id ? "border-primary ring-1 ring-primary" : ""}`}>
+              className={`w-full rounded-lg border bg-card p-3 text-left hover:border-primary ${current?.id === c.id ? "border-primary ring-1 ring-primary" : ""}`}>
               <div className="font-semibold">{c.name}</div>
               <div className="truncate text-sm text-muted-foreground">{c.headline}</div>
             </button>
