@@ -34,9 +34,20 @@ const SECTIONS: { id: Bucket; label: string }[] = [
 
 function Today() {
   const { tracks, loading } = useStore();
+  const [view, setView] = useState<"priority" | "stage">("priority");
+  const [filter, setFilter] = useState<"all" | Bucket | number>("all");
   const due = tracks.filter((t) => ["overdue", "today"].includes(bucketOf(t))).length;
   const replied = tracks.filter((t) => t.status === "replied" || t.status === "call_booked").length;
   const rate = tracks.length ? Math.round((replied / tracks.length) * 100) : 0;
+
+  const priorityOrder: Record<Bucket, number> = { overdue: 0, today: 1, upcoming: 2, done: 3 };
+  const sortPriority = (a: Track, b: Track) => {
+    const d = priorityOrder[bucketOf(a)] - priorityOrder[bucketOf(b)];
+    return d !== 0 ? d : (a.nextContactAt ?? "").localeCompare(b.nextContactAt ?? "");
+  };
+
+  const active = tracks.filter((t) => t.status === "active");
+  const stageGroups = STEPS.map((_, i) => active.filter((t) => t.step === i).sort(sortPriority));
 
   return (
     <div className="mx-auto max-w-4xl">
@@ -60,11 +71,41 @@ function Today() {
           <div className="p-8"><EmptyState text="No candidates in a sequence yet. Click “Track candidate” to start one." /></div>
         )}
 
-        {SECTIONS.map((s) => {
+        {tracks.length > 0 && (
+          <div className="flex flex-wrap items-center gap-2 border-b bg-muted/30 px-8 py-3">
+            <div className="flex rounded-lg border bg-muted/50 p-0.5">
+              <button onClick={() => { setView("priority"); setFilter("all"); }} className={`rounded-md px-3 py-1 text-xs font-semibold transition-colors ${view === "priority" ? "bg-background text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"}`}>
+                By priority
+              </button>
+              <button onClick={() => { setView("stage"); setFilter("all"); }} className={`rounded-md px-3 py-1 text-xs font-semibold transition-colors ${view === "stage" ? "bg-background text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"}`}>
+                By stage
+              </button>
+            </div>
+            <div className="flex flex-wrap items-center gap-1.5">
+              {view === "priority" ? (
+                <>
+                  <FilterChip label="All" count={tracks.length} active={filter === "all"} onClick={() => setFilter("all")} />
+                  {SECTIONS.filter((s) => s.id !== "done").map((s) => (
+                    <FilterChip key={s.id} label={s.label} count={tracks.filter((t) => bucketOf(t) === s.id).length} active={filter === s.id} onClick={() => setFilter(s.id)} />
+                  ))}
+                </>
+              ) : (
+                <>
+                  <FilterChip label="All steps" count={active.length} active={filter === "all"} onClick={() => setFilter("all")} />
+                  {STEPS.map((s, i) => (
+                    <FilterChip key={s.short} label={`Step ${i + 1}: ${s.short}`} count={stageGroups[i]!.length} active={filter === i} onClick={() => setFilter(i)} />
+                  ))}
+                </>
+              )}
+            </div>
+          </div>
+        )}
+
+        {view === "priority" && tracks.length > 0 && SECTIONS.map((s) => {
           const list = tracks
-            .filter((t) => bucketOf(t) === s.id)
-            .sort((a, b) => (a.nextContactAt ?? "").localeCompare(b.nextContactAt ?? ""));
-          if (!list.length) return null;
+            .filter((t) => bucketOf(t) === s.id && (filter === "all" || filter === s.id))
+            .sort(sortPriority);
+          if (!list.length || (filter !== "all" && s.id !== filter)) return null;
           return (
             <div key={s.id}>
               <div className="border-b bg-muted/50 px-8 py-2 text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
@@ -77,6 +118,29 @@ function Today() {
           );
         })}
 
+        {view === "stage" && (
+          <>
+            {STEPS.map((s, i) => {
+              if (filter !== "all" && filter !== i) return null;
+              const list = stageGroups[i]!;
+              if (!list.length) return null;
+              return (
+                <div key={s.label}>
+                  <div className="border-b bg-muted/50 px-8 py-2 text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
+                    Step {i + 1} · {s.label} · {list.length}
+                  </div>
+                  <div className="divide-y">
+                    {list.map((t) => <TrackCard key={t.id} track={t} />)}
+                  </div>
+                </div>
+              );
+            })}
+            {active.length === 0 && (
+              <div className="p-8"><EmptyState text="No active sequences. Every candidate has replied or been closed." /></div>
+            )}
+          </>
+        )}
+
         <div className="flex flex-wrap items-center justify-between gap-2 border-t bg-muted/50 px-8 py-4 text-xs">
           <div className="flex gap-4">
             <span className="text-muted-foreground">In tracker: <strong className="text-foreground">{tracks.length}</strong></span>
@@ -86,6 +150,18 @@ function Today() {
         </div>
       </div>
     </div>
+  );
+}
+
+function FilterChip({ label, count, active, onClick }: { label: string; count: number; active: boolean; onClick: () => void }) {
+  return (
+    <button
+      onClick={onClick}
+      className={`flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-semibold transition-colors ${active ? "border-primary bg-primary text-primary-foreground" : "text-muted-foreground hover:border-primary/40 hover:text-foreground"}`}
+    >
+      {label}
+      <span className={`rounded-full px-1.5 py-px text-[10px] ${active ? "bg-primary-foreground/20 text-primary-foreground" : "bg-muted text-muted-foreground"}`}>{count}</span>
+    </button>
   );
 }
 
