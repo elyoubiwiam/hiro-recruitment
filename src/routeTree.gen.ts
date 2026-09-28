@@ -17,6 +17,7 @@ import { Route as AuthenticatedCallsRouteImport } from './routes/_authenticated/
 import { Route as AuthenticatedCandidatesRouteImport } from './routes/_authenticated/candidates'
 import { Route as AuthenticatedOutreachRouteImport } from './routes/_authenticated/outreach'
 import { Route as AuthenticatedScreeningRouteImport } from './routes/_authenticated/screening'
+import { Route as AuthenticatedTodayRouteImport } from './routes/_authenticated/today'
 import { Route as AuthenticatedJobsIndexRouteImport } from './routes/_authenticated/jobs.index'
 import { Route as AuthenticatedJobsJobIdRouteImport } from './routes/_authenticated/jobs.$jobId'
 
@@ -59,6 +60,11 @@ const AuthenticatedScreeningRoute = AuthenticatedScreeningRouteImport.update({
   path: '/screening',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedTodayRoute = AuthenticatedTodayRouteImport.update({
+  id: '/today',
+  path: '/today',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedJobsIndexRoute = AuthenticatedJobsIndexRouteImport.update({
   id: '/jobs/',
   path: '/jobs/',
@@ -78,6 +84,7 @@ export interface FileRoutesByFullPath {
   '/candidates': typeof AuthenticatedCandidatesRoute
   '/outreach': typeof AuthenticatedOutreachRoute
   '/screening': typeof AuthenticatedScreeningRoute
+  '/today': typeof AuthenticatedTodayRoute
   '/jobs/$jobId': typeof AuthenticatedJobsJobIdRoute
   '/jobs/': typeof AuthenticatedJobsIndexRoute
 }
@@ -89,6 +96,7 @@ export interface FileRoutesByTo {
   '/candidates': typeof AuthenticatedCandidatesRoute
   '/outreach': typeof AuthenticatedOutreachRoute
   '/screening': typeof AuthenticatedScreeningRoute
+  '/today': typeof AuthenticatedTodayRoute
   '/jobs/$jobId': typeof AuthenticatedJobsJobIdRoute
   '/jobs': typeof AuthenticatedJobsIndexRoute
 }
@@ -102,6 +110,7 @@ export interface FileRoutesById {
   '/_authenticated/candidates': typeof AuthenticatedCandidatesRoute
   '/_authenticated/outreach': typeof AuthenticatedOutreachRoute
   '/_authenticated/screening': typeof AuthenticatedScreeningRoute
+  '/_authenticated/today': typeof AuthenticatedTodayRoute
   '/_authenticated/jobs/$jobId': typeof AuthenticatedJobsJobIdRoute
   '/_authenticated/jobs/': typeof AuthenticatedJobsIndexRoute
 }
@@ -115,6 +124,7 @@ export interface FileRouteTypes {
     | '/candidates'
     | '/outreach'
     | '/screening'
+    | '/today'
     | '/jobs/$jobId'
     | '/jobs/'
   fileRoutesByTo: FileRoutesByTo
@@ -126,6 +136,7 @@ export interface FileRouteTypes {
     | '/candidates'
     | '/outreach'
     | '/screening'
+    | '/today'
     | '/jobs/$jobId'
     | '/jobs'
   id:
@@ -138,6 +149,7 @@ export interface FileRouteTypes {
     | '/_authenticated/candidates'
     | '/_authenticated/outreach'
     | '/_authenticated/screening'
+    | '/_authenticated/today'
     | '/_authenticated/jobs/$jobId'
     | '/_authenticated/jobs/'
   fileRoutesById: FileRoutesById
@@ -207,6 +219,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedScreeningRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/today': {
+      id: '/_authenticated/today'
+      path: '/today'
+      fullPath: '/today'
+      preLoaderRoute: typeof AuthenticatedTodayRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/jobs/': {
       id: '/_authenticated/jobs/'
       path: '/jobs'
@@ -229,6 +248,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedCandidatesRoute: typeof AuthenticatedCandidatesRoute
   AuthenticatedOutreachRoute: typeof AuthenticatedOutreachRoute
   AuthenticatedScreeningRoute: typeof AuthenticatedScreeningRoute
+  AuthenticatedTodayRoute: typeof AuthenticatedTodayRoute
   AuthenticatedJobsJobIdRoute: typeof AuthenticatedJobsJobIdRoute
   AuthenticatedJobsIndexRoute: typeof AuthenticatedJobsIndexRoute
 }
@@ -238,6 +258,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedCandidatesRoute: AuthenticatedCandidatesRoute,
   AuthenticatedOutreachRoute: AuthenticatedOutreachRoute,
   AuthenticatedScreeningRoute: AuthenticatedScreeningRoute,
+  AuthenticatedTodayRoute: AuthenticatedTodayRoute,
   AuthenticatedJobsJobIdRoute: AuthenticatedJobsJobIdRoute,
   AuthenticatedJobsIndexRoute: AuthenticatedJobsIndexRoute,
 }
