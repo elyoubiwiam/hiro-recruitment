@@ -44,6 +44,7 @@ export interface Candidate {
   experience: { title: string; company: string; start: string; end: string; highlights: string[] }[];
   education: { degree: string; school: string; year: string }[];
   rawText: string;
+  cvFile?: { name: string; type: string; size: number; uploadedAt: string } | undefined;
   createdAt: string;
 }
 

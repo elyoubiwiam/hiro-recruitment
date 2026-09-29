@@ -21,6 +21,20 @@ function read(): Record<string, { at: number; v: unknown }> {
   }
 }
 
+/** Removes cached AI results that mention any of the given values (e.g. a deleted candidate). */
+export function forgetAI(values: string[]) {
+  const needles = values.filter((v) => v && v.length > 2);
+  if (!needles.length) return;
+  const cache = read();
+  for (const [k, e] of Object.entries(cache)) {
+    const txt = JSON.stringify(e.v);
+    if (needles.some((n) => txt.includes(n))) delete cache[k];
+  }
+  try {
+    localStorage.setItem(KEY, JSON.stringify(cache));
+  } catch {}
+}
+
 /**
  * Runs an AI task once per identical input. Repeat requests (same CV, same job)
  * return the saved result and never spend credits again, unless `force` is set.
