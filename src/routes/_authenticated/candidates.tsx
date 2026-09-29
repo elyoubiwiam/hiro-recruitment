@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useRef, useState } from "react";
-import { PanelRightOpen, FileSearch, GraduationCap, Mail, MapPin, Phone, Trash2, Upload } from "lucide-react";
+import { useMemo, useRef, useState } from "react";
+import { Filter, PanelRightOpen, FileSearch, GraduationCap, Mail, MapPin, Phone, Trash2, Upload, X } from "lucide-react";
 import { toast } from "sonner";
 import { PageHeader } from "@/components/AppShell";
 import { EmptyState, GenerateButton } from "@/components/shared";
@@ -8,6 +8,8 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
+import { Input } from "@/components/ui/input";
+import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuLabel, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { runAI } from "@/lib/ai.functions";
 import { extractFile } from "@/lib/file-extract";
 import { cvMeta, saveCvFile } from "@/lib/cv-files";
@@ -34,8 +36,40 @@ function CandidatesPage() {
   const [selected, setSelected] = useState<string | undefined>(candidates[0]?.id);
   const [text, setText] = useState("");
   const [loading, setLoading] = useState(false);
+  const [query, setQuery] = useState("");
+  const [fLocations, setFLocations] = useState<string[]>([]);
+  const [fSkills, setFSkills] = useState<string[]>([]);
+  const [fSchools, setFSchools] = useState<string[]>([]);
   const fileRef = useRef<HTMLInputElement>(null);
   const current = candidates.find((c) => c.id === selected) ?? candidates[0];
+
+  const sorted = useMemo(
+    () => [...candidates].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()),
+    [candidates],
+  );
+  const locations = useMemo(() => [...new Set(candidates.map((c) => c.location).filter(Boolean))].sort(), [candidates]);
+  const skills = useMemo(() => [...new Set(candidates.flatMap((c) => c.skills))].sort(), [candidates]);
+  const schools = useMemo(() => [...new Set(candidates.flatMap((c) => c.education.map((e) => e.school)).filter(Boolean))].sort(), [candidates]);
+
+  const filtering = query.trim() !== "" || fLocations.length > 0 || fSkills.length > 0 || fSchools.length > 0;
+  const visible = useMemo(() => {
+    if (!filtering) return sorted.slice(0, 5);
+    const q = query.trim().toLowerCase();
+    return sorted.filter((c) => {
+      if (q && ![c.name, c.headline, c.summary, c.location, ...c.skills].join(" ").toLowerCase().includes(q)) return false;
+      if (fLocations.length && !fLocations.includes(c.location)) return false;
+      if (fSkills.length && !fSkills.some((s) => c.skills.includes(s))) return false;
+      if (fSchools.length && !c.education.some((e) => fSchools.includes(e.school))) return false;
+      return true;
+    });
+  }, [sorted, filtering, query, fLocations, fSkills, fSchools]);
+
+  function toggle(list: string[], set: (v: string[]) => void, value: string) {
+    set(list.includes(value) ? list.filter((v) => v !== value) : [...list, value]);
+  }
+  function clearFilters() {
+    setQuery(""); setFLocations([]); setFSkills([]); setFSchools([]);
+  }
 
   async function parse(payload: { text?: string; fileData?: string; filename?: string }, file?: File) {
     setLoading(true);
@@ -97,13 +131,28 @@ function CandidatesPage() {
 
       <div className="grid gap-6 lg:grid-cols-[320px_1fr]">
         <div className="space-y-2">
-          {candidates.map((c) => (
+          <div className="mb-3 space-y-2">
+            <Input placeholder="Search name, skill, headline..." value={query} onChange={(e) => setQuery(e.target.value)} />
+            <div className="flex flex-wrap gap-2">
+              <FilterMenu label="Location" options={locations} active={fLocations} onToggle={(v) => toggle(fLocations, setFLocations, v)} />
+              <FilterMenu label="Skill" options={skills} active={fSkills} onToggle={(v) => toggle(fSkills, setFSkills, v)} />
+              <FilterMenu label="Education" options={schools} active={fSchools} onToggle={(v) => toggle(fSchools, setFSchools, v)} />
+              {filtering && (
+                <Button size="sm" variant="ghost" onClick={clearFilters}><X className="h-4 w-4" />Clear</Button>
+              )}
+            </div>
+          </div>
+          <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+            {filtering ? `${visible.length} candidate${visible.length === 1 ? "" : "s"} found` : "Latest candidates added"}
+          </div>
+          {visible.map((c) => (
             <button key={c.id} onClick={() => { setSelected(c.id); drawer.open(c.id); }}
               className={`w-full rounded-xl border bg-card p-3 text-left hover:border-primary ${current?.id === c.id ? "border-primary ring-1 ring-primary" : ""}`}>
               <div className="font-semibold">{c.name}</div>
               <div className="truncate text-sm text-muted-foreground">{c.headline}</div>
             </button>
           ))}
+          {visible.length === 0 && <div className="rounded-xl border border-dashed p-4 text-sm text-muted-foreground">No candidates match these filters.</div>}
         </div>
         {current ? (
           <div className="rounded-xl border bg-card p-6">
@@ -147,5 +196,24 @@ function CandidatesPage() {
         ) : <EmptyState text="Select or upload a candidate." />}
       </div>
     </>
+  );
+}
+
+function FilterMenu({ label, options, active, onToggle }: { label: string; options: string[]; active: string[]; onToggle: (v: string) => void }) {
+  if (options.length === 0) return null;
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button size="sm" variant={active.length ? "default" : "outline"}>
+          <Filter className="h-3.5 w-3.5" />{label}{active.length > 0 && ` (${active.length})`}
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent className="max-h-72 overflow-auto">
+        <DropdownMenuLabel>{label}: select one or more</DropdownMenuLabel>
+        {options.map((o) => (
+          <DropdownMenuCheckboxItem key={o} checked={active.includes(o)} onCheckedChange={() => onToggle(o)}>{o}</DropdownMenuCheckboxItem>
+        ))}
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 }
