@@ -12,9 +12,9 @@ import { Bar, BarChart, CartesianGrid, Cell, Pie, PieChart, XAxis, YAxis } from 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () => ({
     meta: [
-      { title: "Recruitment Dashboard | Talentdesk" },
+      { title: "Recruitment Dashboard | Hiro" },
       { name: "description", content: "Monitor recruitment workload, outreach results, screening progress and next actions." },
-      { property: "og:title", content: "Recruitment Dashboard | Talentdesk" },
+      { property: "og:title", content: "Recruitment Dashboard | Hiro" },
       { property: "og:description", content: "Monitor recruitment workload, outreach results, screening progress and next actions." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },

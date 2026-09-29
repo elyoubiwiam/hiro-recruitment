@@ -18,7 +18,7 @@ const NAV = [
 
 export const PUBLIC = ["/", "/auth", "/reset-password"];
 
-const THEME_KEY = "talentdesk-theme";
+const THEME_KEY = "hiro-theme";
 
 function useTheme() {
   const [dark, setDark] = useState<boolean | null>(null);
@@ -62,7 +62,7 @@ export function AppShell({ children }: { children: ReactNode }) {
           <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
             <div className="h-3.5 w-3.5 rounded-sm border-2 border-primary-foreground" />
           </div>
-          <span className="flex-1 text-lg font-bold tracking-tight text-foreground">Talentdesk</span>
+          <span className="flex-1 text-lg font-bold tracking-tight text-foreground">Hiro</span>
           <button
             onClick={() => setDark(!dark)}
             aria-label={dark ? "Switch to light mode" : "Switch to dark mode"}

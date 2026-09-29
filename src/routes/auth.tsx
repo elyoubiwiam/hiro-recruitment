@@ -9,9 +9,9 @@ import { supabase } from "@/integrations/supabase/client";
 export const Route = createFileRoute("/auth")({
   head: () => ({
     meta: [
-      { title: "Sign in | Talentdesk" },
-      { name: "description", content: "Sign in or create your private Talentdesk recruiting workspace." },
-      { property: "og:title", content: "Sign in | Talentdesk" },
+      { title: "Sign in | Hiro" },
+      { name: "description", content: "Sign in or create your private Hiro recruiting workspace." },
+      { property: "og:title", content: "Sign in | Hiro" },
       { property: "og:description", content: "Access your private recruiting workspace." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -66,9 +66,9 @@ function AuthPage() {
           <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
             <div className="h-3.5 w-3.5 rounded-sm border-2 border-primary-foreground" />
           </div>
-          <span className="text-lg font-bold tracking-tight">Talentdesk</span>
+          <span className="text-lg font-bold tracking-tight">Hiro</span>
         </Link>
-        <h1 className="text-xl">{mode === "signin" ? "Sign in to Talentdesk" : mode === "signup" ? "Create your workspace" : "Reset your password"}</h1>
+        <h1 className="text-xl">{mode === "signin" ? "Sign in to Hiro" : mode === "signup" ? "Create your workspace" : "Reset your password"}</h1>
         <p className="mb-6 mt-1 text-sm text-muted-foreground">Your data is private to your account.</p>
         {sent ? (
           <div className="rounded-lg bg-accent p-4 text-sm text-accent-foreground">{sent}</div>

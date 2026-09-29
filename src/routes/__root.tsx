@@ -81,9 +81,9 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Talentdesk | Recruitment workspace" },
+      { title: "Hiro | Recruitment workspace" },
       { name: "description", content: "AI-native workspace for agency recruiters: jobs, CV matching, outreach and submissions." },
-      { property: "og:title", content: "Talentdesk | Recruitment workspace" },
+      { property: "og:title", content: "Hiro | Recruitment workspace" },
       { property: "og:description", content: "AI-native workspace for agency recruiters." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -114,7 +114,7 @@ function RootShell({ children }: { children: ReactNode }) {
       <head>
         <script
           dangerouslySetInnerHTML={{
-            __html: `try{var t=localStorage.getItem("talentdesk-theme");if(t==="dark")document.documentElement.classList.add("dark")}catch(e){}`,
+            __html: `try{var t=localStorage.getItem("hiro-theme");if(t==="dark")document.documentElement.classList.add("dark")}catch(e){}`,
           }}
         />
         <HeadContent />

@@ -7,9 +7,9 @@ import { supabase } from "@/integrations/supabase/client";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Talentdesk | Recruitment workspace" },
+      { title: "Hiro | Recruitment workspace" },
       { name: "description", content: "Track every candidate touchpoint, get personalized drafts for each step, and match CVs to jobs with explainable AI." },
-      { property: "og:title", content: "Talentdesk | Recruitment workspace" },
+      { property: "og:title", content: "Hiro | Recruitment workspace" },
       { property: "og:description", content: "Outreach tracking, personalized drafts, CV matching and client submissions." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -40,7 +40,7 @@ function Landing() {
           <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
             <div className="h-3.5 w-3.5 rounded-sm border-2 border-primary-foreground" />
           </div>
-          <span className="text-lg font-bold tracking-tight">Talentdesk</span>
+          <span className="text-lg font-bold tracking-tight">Hiro</span>
         </div>
         <Button asChild variant="outline"><Link to="/dashboard">Open workspace</Link></Button>
       </header>
@@ -50,7 +50,7 @@ function Landing() {
         </span>
         <h1 className="mt-5 max-w-2xl text-5xl leading-tight">Track, manage and optimise your recruiter process.</h1>
         <p className="mt-4 max-w-xl text-lg text-muted-foreground">
-          Talentdesk tracks every step of your candidate outreach and prepares a personalized message for the next one.
+          Hiro tracks every step of your candidate outreach and prepares a personalized message for the next one.
         </p>
         <div className="mt-8 flex flex-wrap items-center gap-3">
           <Button asChild size="lg"><Link to="/dashboard">Open the workspace <ArrowRight className="h-4 w-4" /></Link></Button>

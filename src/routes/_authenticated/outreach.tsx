@@ -14,9 +14,9 @@ export const Route = createFileRoute("/_authenticated/outreach")({
   validateSearch: z.object({ candidate: z.string().optional(), job: z.string().optional() }),
   head: () => ({
     meta: [
-      { title: "Outreach Generator | Talentdesk" },
+      { title: "Outreach Generator | Hiro" },
       { name: "description", content: "Generate tailored LinkedIn and email outreach sequences for candidates." },
-      { property: "og:title", content: "Outreach Generator | Talentdesk" },
+      { property: "og:title", content: "Outreach Generator | Hiro" },
       { property: "og:description", content: "Tailored multi-step candidate outreach, instantly." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
