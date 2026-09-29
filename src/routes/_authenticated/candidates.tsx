@@ -131,13 +131,28 @@ function CandidatesPage() {
 
       <div className="grid gap-6 lg:grid-cols-[320px_1fr]">
         <div className="space-y-2">
-          {candidates.map((c) => (
+          <div className="mb-3 space-y-2">
+            <Input placeholder="Search name, skill, headline..." value={query} onChange={(e) => setQuery(e.target.value)} />
+            <div className="flex flex-wrap gap-2">
+              <FilterMenu label="Location" options={locations} active={fLocations} onToggle={(v) => toggle(fLocations, setFLocations, v)} />
+              <FilterMenu label="Skill" options={skills} active={fSkills} onToggle={(v) => toggle(fSkills, setFSkills, v)} />
+              <FilterMenu label="Education" options={schools} active={fSchools} onToggle={(v) => toggle(fSchools, setFSchools, v)} />
+              {filtering && (
+                <Button size="sm" variant="ghost" onClick={clearFilters}><X className="h-4 w-4" />Clear</Button>
+              )}
+            </div>
+          </div>
+          <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+            {filtering ? `${visible.length} candidate${visible.length === 1 ? "" : "s"} found` : "Latest candidates added"}
+          </div>
+          {visible.map((c) => (
             <button key={c.id} onClick={() => { setSelected(c.id); drawer.open(c.id); }}
               className={`w-full rounded-xl border bg-card p-3 text-left hover:border-primary ${current?.id === c.id ? "border-primary ring-1 ring-primary" : ""}`}>
               <div className="font-semibold">{c.name}</div>
               <div className="truncate text-sm text-muted-foreground">{c.headline}</div>
             </button>
           ))}
+          {visible.length === 0 && <div className="rounded-xl border border-dashed p-4 text-sm text-muted-foreground">No candidates match these filters.</div>}
         </div>
         {current ? (
           <div className="rounded-xl border bg-card p-6">
