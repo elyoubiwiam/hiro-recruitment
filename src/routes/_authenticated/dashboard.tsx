@@ -1,10 +1,12 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowRight, BriefcaseBusiness, CalendarClock, CheckCheck, FileSearch, MessageSquareReply, PhoneCall, Users } from "lucide-react";
+import { ArrowRight, BarChart3, BriefcaseBusiness, CalendarClock, CheckCheck, FileSearch, MessageSquareReply, PhoneCall, Users } from "lucide-react";
 import { PageHeader } from "@/components/AppShell";
 import { Button } from "@/components/ui/button";
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import { useStore } from "@/lib/store";
-import { bucketOf } from "@/lib/tracking";
-import { STAGES } from "@/lib/types";
+import { bucketOf, STATUS_LABEL, STEPS } from "@/lib/tracking";
+import { STAGES, type Track } from "@/lib/types";
+import { Bar, BarChart, CartesianGrid, Cell, Pie, PieChart, XAxis, YAxis } from "recharts";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () => ({
