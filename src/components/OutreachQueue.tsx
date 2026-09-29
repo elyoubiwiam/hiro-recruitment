@@ -160,6 +160,7 @@ function initials(n: string) {
 
 function TrackCard({ track: t }: { track: Track }) {
   const { candidates, jobs, clients, updateTrack } = useStore();
+  const drawer = useCandidateDrawer();
   const cand = candidates.find((c) => c.id === t.candidateId);
   const job = jobs.find((j) => j.id === t.jobId);
   const [busy, setBusy] = useState(false);
@@ -219,7 +220,7 @@ function TrackCard({ track: t }: { track: Track }) {
         <div className="min-w-0 flex-grow">
           <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
             <div>
-              <h3 className="text-base font-semibold">{cand.name}</h3>
+              <button onClick={() => drawer.open(cand.id, job.id)} className="text-left text-base font-semibold hover:text-primary hover:underline">{cand.name}</button>
               <p className="text-sm text-muted-foreground">{cand.headline}</p>
               <p className="mt-0.5 text-xs text-muted-foreground">For <span className="font-medium text-foreground">{job.title}</span> · {clients.find((c) => c.id === job.clientId)?.name}</p>
             </div>
