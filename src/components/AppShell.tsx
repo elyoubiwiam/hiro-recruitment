@@ -1,11 +1,12 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { Briefcase, CalendarCheck, FileSearch, LogOut, MessagesSquare, Moon, PhoneCall, ShieldCheck, Sun, Users } from "lucide-react";
+import { Briefcase, CalendarCheck, FileSearch, LayoutDashboard, LogOut, MessagesSquare, Moon, PhoneCall, ShieldCheck, Sun, Users } from "lucide-react";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { toast } from "sonner";
 import { useStore } from "@/lib/store";
 import { bucketOf } from "@/lib/tracking";
 
 const NAV = [
+  { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { to: "/today", label: "Today", icon: CalendarCheck },
   { to: "/jobs", label: "Clients & Jobs", icon: Briefcase },
   { to: "/candidates", label: "Candidates", icon: Users },

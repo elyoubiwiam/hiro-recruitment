@@ -6,3 +6,4 @@
 - [x] Personalized draft message for the current step of each candidate
 - [x] Reminders for next step (in-app only)
 - [x] Cleaner UI redesign ("Focused action cards" direction)
+- [x] Dashboard with recruitment KPIs and data-based next actions

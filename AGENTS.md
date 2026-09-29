@@ -13,3 +13,4 @@
 - AI goes through runAI (requireSupabaseAuth) in src/lib/ai.functions.ts. Why: only signed-in users can spend AI credits.
 - Outreach sequence steps/timings live in src/lib/tracking.ts. Why: single source for due-date logic.
 - AI output and saved demo data pass through shared copy normalization before display. Why: previously saved and generated text must follow the app's no-em-dash copy rule.
+- Dashboard KPIs and recommendations derive from the current store and tracker status, without a separate analytics table. Why: metrics update immediately with recruiter activity and do not imply unsupported historical trends.
