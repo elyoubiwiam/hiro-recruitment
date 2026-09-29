@@ -18,6 +18,8 @@ export const Route = createFileRoute("/_authenticated/outreach")({
       { name: "description", content: "Generate tailored LinkedIn and email outreach sequences for candidates." },
       { property: "og:title", content: "Outreach Generator | Talentdesk" },
       { property: "og:description", content: "Tailored multi-step candidate outreach, instantly." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: Outreach,

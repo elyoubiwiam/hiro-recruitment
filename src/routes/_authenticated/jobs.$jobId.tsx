@@ -13,6 +13,8 @@ export const Route = createFileRoute("/_authenticated/jobs/$jobId")({
       { name: "description", content: "Job details, requirements and matched candidates." },
       { property: "og:title", content: "Job requisition | Talentdesk" },
       { property: "og:description", content: "Job details and matched candidates." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: JobPage,

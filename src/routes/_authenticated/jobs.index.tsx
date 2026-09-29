@@ -21,6 +21,8 @@ export const Route = createFileRoute("/_authenticated/jobs/")({
       { name: "description", content: "Manage agency clients and open job requisitions in list or pipeline view." },
       { property: "og:title", content: "Clients & Jobs | Talentdesk" },
       { property: "og:description", content: "Manage agency clients and open job requisitions." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: Dashboard,

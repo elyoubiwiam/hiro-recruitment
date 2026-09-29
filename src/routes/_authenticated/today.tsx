@@ -20,6 +20,8 @@ export const Route = createFileRoute("/_authenticated/today")({
       { name: "description", content: "Who to contact today, with a personalized draft for each candidate's next step." },
       { property: "og:title", content: "Today | Talentdesk" },
       { property: "og:description", content: "Your outreach follow-up queue." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: Today,

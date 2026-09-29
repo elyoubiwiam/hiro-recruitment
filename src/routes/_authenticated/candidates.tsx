@@ -19,6 +19,8 @@ export const Route = createFileRoute("/_authenticated/candidates")({
       { name: "description", content: "Upload CVs and let AI parse them into structured candidate profiles." },
       { property: "og:title", content: "Candidates | Talentdesk" },
       { property: "og:description", content: "AI CV parsing into structured candidate profiles." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: CandidatesPage,

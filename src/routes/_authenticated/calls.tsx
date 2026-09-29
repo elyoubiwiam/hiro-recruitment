@@ -18,6 +18,8 @@ export const Route = createFileRoute("/_authenticated/calls")({
       { name: "description", content: "Turn phone-screen notes into executive profiles and client submission notes." },
       { property: "og:title", content: "Call Synthesizer | Talentdesk" },
       { property: "og:description", content: "Phone screens to client-ready submissions." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: Calls,
