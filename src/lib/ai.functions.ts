@@ -6,7 +6,7 @@ export const runAI = createServerFn({ method: "POST" })
   .inputValidator((d) =>
     z
       .object({
-        task: z.enum(["parse_cv", "match", "outreach", "synthesize", "step_draft"]),
+        task: z.enum(["parse_cv", "match", "outreach", "synthesize", "step_draft", "triage"]),
         payload: z.any(),
       })
       .parse(d),
