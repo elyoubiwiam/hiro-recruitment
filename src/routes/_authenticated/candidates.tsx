@@ -198,3 +198,22 @@ function CandidatesPage() {
     </>
   );
 }
+
+function FilterMenu({ label, options, active, onToggle }: { label: string; options: string[]; active: string[]; onToggle: (v: string) => void }) {
+  if (options.length === 0) return null;
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button size="sm" variant={active.length ? "default" : "outline"}>
+          <Filter className="h-3.5 w-3.5" />{label}{active.length > 0 && ` (${active.length})`}
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent className="max-h-72 overflow-auto">
+        <DropdownMenuLabel>{label}: select one or more</DropdownMenuLabel>
+        {options.map((o) => (
+          <DropdownMenuCheckboxItem key={o} checked={active.includes(o)} onCheckedChange={() => onToggle(o)}>{o}</DropdownMenuCheckboxItem>
+        ))}
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+}
