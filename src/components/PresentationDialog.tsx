@@ -19,7 +19,7 @@ export function redact(s: string, c: Candidate) {
   return out;
 }
 
-export function PresentationDialog({ open, onOpenChange, candidate: c, job }: { open: boolean; onOpenChange: (o: boolean) => void; candidate: Candidate; job?: Job }) {
+export function PresentationDialog({ open, onOpenChange, candidate: c, job }: { open: boolean; onOpenChange: (o: boolean) => void; candidate: Candidate; job?: Job | undefined }) {
   const { matches, transcripts, clients } = useStore();
   const [anon, setAnon] = useState(false);
   const match = job ? matches.find((m) => m.candidateId === c.id && m.jobId === job.id)?.result : undefined;
@@ -53,7 +53,7 @@ export function PresentationDialog({ open, onOpenChange, candidate: c, job }: { 
 
   function print() {
     const w = window.open("", "_blank");
-    if (!w) return toast.error("Allow pop-ups to export the presentation.");
+    if (!w) { toast.error("Allow pop-ups to export the presentation."); return; }
     const esc = (s: string) => s.replace(/[&<>]/g, (ch) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" })[ch]!);
     w.document.write(`<html><head><title>${esc(name)} | Candidate presentation</title><style>body{font-family:Inter,system-ui,sans-serif;max-width:720px;margin:40px auto;color:#1a1523;line-height:1.55}h1{margin:0}h2{font-size:13px;text-transform:uppercase;letter-spacing:.08em;color:#773CD6;margin-top:28px}.score{font-size:40px;font-weight:700;color:#773CD6}.muted{color:#6b6477}</style></head><body>
       <h1>${esc(name)}</h1><div class="muted">${esc(c.headline)}${c.location ? ` · ${esc(c.location)}` : ""}</div>

@@ -62,7 +62,7 @@ export function BulkTriage({ job }: { job: Job }) {
     .filter((r) => r.m)
     .filter((r) => filter === "all" || r.s === filter)
     .sort((a, b) => (a.s === "rejected" ? 1 : 0) - (b.s === "rejected" ? 1 : 0) || b.m!.result.score - a.m!.result.score);
-  const tierVariant = (s: number) => (s >= 80 ? "default" : s >= 60 ? "secondary" : "outline") as const;
+  const tierVariant = (s: number): "default" | "secondary" | "outline" => (s >= 80 ? "default" : s >= 60 ? "secondary" : "outline");
 
   return (
     <section className="space-y-4">

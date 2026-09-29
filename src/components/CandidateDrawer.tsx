@@ -22,7 +22,7 @@ const DrawerCtx = createContext<Ctx>({ open: () => {} });
 export const useCandidateDrawer = () => useContext(DrawerCtx);
 
 export function CandidateDrawerProvider({ children }: { children: ReactNode }) {
-  const [state, setState] = useState<{ candidateId: string; jobId?: string } | null>(null);
+  const [state, setState] = useState<{ candidateId: string; jobId?: string | undefined } | null>(null);
   return (
     <DrawerCtx.Provider value={{ open: (candidateId, jobId) => setState({ candidateId, jobId }) }}>
       {children}
@@ -40,7 +40,7 @@ function stripForAI(c: Candidate) {
   return { ...rest, cv: rawText };
 }
 
-function DrawerBody({ candidateId, initialJobId }: { candidateId: string; initialJobId?: string }) {
+function DrawerBody({ candidateId, initialJobId }: { candidateId: string; initialJobId?: string | undefined }) {
   const { candidates, jobs, clients, matches } = useStore();
   const cand = candidates.find((c) => c.id === candidateId);
   const firstMatched = matches.find((m) => m.candidateId === candidateId)?.jobId;
