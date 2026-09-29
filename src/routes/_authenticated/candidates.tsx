@@ -36,8 +36,40 @@ function CandidatesPage() {
   const [selected, setSelected] = useState<string | undefined>(candidates[0]?.id);
   const [text, setText] = useState("");
   const [loading, setLoading] = useState(false);
+  const [query, setQuery] = useState("");
+  const [fLocations, setFLocations] = useState<string[]>([]);
+  const [fSkills, setFSkills] = useState<string[]>([]);
+  const [fSchools, setFSchools] = useState<string[]>([]);
   const fileRef = useRef<HTMLInputElement>(null);
   const current = candidates.find((c) => c.id === selected) ?? candidates[0];
+
+  const sorted = useMemo(
+    () => [...candidates].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()),
+    [candidates],
+  );
+  const locations = useMemo(() => [...new Set(candidates.map((c) => c.location).filter(Boolean))].sort(), [candidates]);
+  const skills = useMemo(() => [...new Set(candidates.flatMap((c) => c.skills))].sort(), [candidates]);
+  const schools = useMemo(() => [...new Set(candidates.flatMap((c) => c.education.map((e) => e.school)).filter(Boolean))].sort(), [candidates]);
+
+  const filtering = query.trim() !== "" || fLocations.length > 0 || fSkills.length > 0 || fSchools.length > 0;
+  const visible = useMemo(() => {
+    if (!filtering) return sorted.slice(0, 5);
+    const q = query.trim().toLowerCase();
+    return sorted.filter((c) => {
+      if (q && ![c.name, c.headline, c.summary, c.location, ...c.skills].join(" ").toLowerCase().includes(q)) return false;
+      if (fLocations.length && !fLocations.includes(c.location)) return false;
+      if (fSkills.length && !fSkills.some((s) => c.skills.includes(s))) return false;
+      if (fSchools.length && !c.education.some((e) => fSchools.includes(e.school))) return false;
+      return true;
+    });
+  }, [sorted, filtering, query, fLocations, fSkills, fSchools]);
+
+  function toggle(list: string[], set: (v: string[]) => void, value: string) {
+    set(list.includes(value) ? list.filter((v) => v !== value) : [...list, value]);
+  }
+  function clearFilters() {
+    setQuery(""); setFLocations([]); setFSkills([]); setFSchools([]);
+  }
 
   async function parse(payload: { text?: string; fileData?: string; filename?: string }, file?: File) {
     setLoading(true);
