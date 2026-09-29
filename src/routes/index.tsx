@@ -48,7 +48,7 @@ function Landing() {
         <span className="inline-flex items-center gap-1.5 rounded-full bg-accent px-3 py-1 text-xs font-semibold text-accent-foreground">
           <span className="h-2 w-2 animate-pulse rounded-full bg-primary" />AI drafting for recruiters
         </span>
-        <h1 className="mt-5 max-w-2xl text-5xl leading-tight">See who needs a response today and prepare the next message.</h1>
+        <h1 className="mt-5 max-w-2xl text-5xl leading-tight">Track, manage and optimise your recruiter process.</h1>
         <p className="mt-4 max-w-xl text-lg text-muted-foreground">
           Talentdesk tracks every step of your candidate outreach and prepares a personalized message for the next one.
         </p>
