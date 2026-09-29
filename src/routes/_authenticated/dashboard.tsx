@@ -38,12 +38,19 @@ function Dashboard() {
   const stageCounts = STAGES.map((stage) => ({ ...stage, count: jobs.filter((job) => job.stage === stage.id).length }));
   const maxStage = Math.max(1, ...stageCounts.map((stage) => stage.count));
 
-  const stepData = STEPS.map((step, index) => ({
+  const STEP_COLORS = {
+    Connect: "var(--color-chart-1)",
+    InMail: "var(--color-chart-2)",
+    "Follow-up 1": "var(--color-chart-3)",
+    "Follow-up 2": "var(--color-chart-4)",
+    Final: "var(--color-chart-5)",
+  } as const;
+  const stepData = STEPS.map((step) => ({
     step: step.short,
-    candidates: activeTracks.filter((track) => track.step === index).length,
+    candidates: activeTracks.filter((track) => track.step === STEPS.findIndex((s) => s.short === step.short)).length,
+    color: STEP_COLORS[step.short],
   }));
-  const STEP_COLORS = ["var(--color-chart-1)", "var(--color-chart-2)", "var(--color-chart-3)", "var(--color-chart-4)", "var(--color-chart-5)"] as const;
-  const stepConfig = Object.fromEntries(STEPS.map((step, index) => [step.short, { label: step.label, color: STEP_COLORS[index] }]));
+  const stepConfig = Object.fromEntries(STEPS.map((step) => [step.short, { label: step.label, color: STEP_COLORS[step.short] }]));
 
   const STATUS_COLORS: Record<Track["status"], string> = {
     active: "var(--color-chart-1)",

@@ -1,4 +1,4 @@
-import type { Candidate, Client, Job, Transcript } from "./types";
+import type { Candidate, Client, Job, MatchRecord, Transcript } from "./types";
 
 const d = (days: number) => new Date(Date.now() - days * 86400000).toISOString();
 
