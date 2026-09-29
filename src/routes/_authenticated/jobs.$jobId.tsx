@@ -9,10 +9,12 @@ import { STAGES } from "@/lib/types";
 export const Route = createFileRoute("/_authenticated/jobs/$jobId")({
   head: () => ({
     meta: [
-      { title: "Job requisition — Talentdesk" },
+      { title: "Job requisition | Talentdesk" },
       { name: "description", content: "Job details, requirements and matched candidates." },
-      { property: "og:title", content: "Job requisition — Talentdesk" },
+      { property: "og:title", content: "Job requisition | Talentdesk" },
       { property: "og:description", content: "Job details and matched candidates." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: JobPage,
@@ -61,7 +63,7 @@ function JobPage() {
             {ranked.map(({ c, m }) => (
               <div key={c.id} className="flex flex-wrap items-center justify-between gap-3 rounded-xl border bg-card p-4">
                 <div className="flex items-center gap-4">
-                  <div className={`w-14 text-center font-display text-2xl ${m ? scoreTone(m.result.score) : "text-muted-foreground"}`}>{m ? `${m.result.score}%` : "—"}</div>
+                  <div className={`w-14 text-center font-display text-2xl ${m ? scoreTone(m.result.score) : "text-muted-foreground"}`}>{m ? `${m.result.score}%` : "Not scored"}</div>
                   <div><div className="font-semibold">{c.name}</div><div className="text-sm text-muted-foreground">{c.headline}</div></div>
                 </div>
                 <div className="flex gap-2">

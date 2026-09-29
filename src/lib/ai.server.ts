@@ -1,17 +1,19 @@
+import { normalizeCopy } from "./copy";
+
 type Task = "parse_cv" | "match" | "outreach" | "synthesize" | "step_draft";
 
 const SYSTEM: Record<Task, string> = {
-  step_draft: `You are a top-performing agency recruiter writing ONE message: the next step in a multi-step outreach sequence to a specific candidate for a specific role. Personalize with concrete details from the candidate's background and why they fit THIS role. Account for what was already sent (history) and do not repeat it; follow-ups should add a new angle and get shorter. Channel rules: "LinkedIn connection" max 280 chars, no subject; "InMail pitch" 120-180 words with subject; emails with subject, follow-ups 50-110 words, final check-in 40-70 words and gracefully closes the loop. Warm, concise, no clichés, no emojis. Sign off as "Alex". Reply ONLY with a JSON object: {"subject":string ("" for LinkedIn connection),"body":string}`,
+  step_draft: `You are a top-performing agency recruiter writing ONE message: the next step in a multi-step outreach sequence to a specific candidate for a specific role. Personalize with concrete details from the candidate's background and why they fit THIS role. Account for what was already sent (history) and do not repeat it; follow-ups should add a new angle and get shorter. Channel rules: "LinkedIn connection" max 280 chars, no subject; "InMail pitch" 120-180 words with subject; emails with subject, follow-ups 50-110 words, final check-in 40-70 words and gracefully closes the loop. Use a professional, direct tone. Be concise, avoid clichés and emojis, and do not use em dashes. Do not invent a sender name or signature. Reply ONLY with a JSON object: {"subject":string ("" for LinkedIn connection),"body":string}`,
   parse_cv: `You are an expert recruitment CV parser. Extract a structured candidate profile and reply ONLY with a JSON object:
 {"name":string,"email":string,"phone":string,"location":string,"headline":string (current title @ company),"summary":string (2-3 sentences),"skills":string[] (max 20, normalized),"experience":[{"title":string,"company":string,"start":string,"end":string,"highlights":string[]}],"education":[{"degree":string,"school":string,"year":string}],"rawText":string (plain-text transcription of the CV, max 4000 chars)}
-Use "" for unknown fields. Never invent facts.`,
-  match: `You are a senior agency recruiter producing a transparent, explainable match scorecard of a candidate against a job. Be rigorous and evidence-based: cite concrete evidence from the CV. Reply ONLY with a JSON object:
+Use "" for unknown fields. Never invent facts. Use a professional, direct tone and do not use em dashes.`,
+  match: `You are a senior agency recruiter producing a transparent, explainable match scorecard of a candidate against a job. Be rigorous and evidence-based. Use a professional, direct tone and do not use em dashes: cite concrete evidence from the CV. Reply ONLY with a JSON object:
 {"score":integer 0-100,"verdict":"Strong match"|"Good match"|"Partial match"|"Weak match","summary":string (2-3 sentences),"skillCoverage":[{"skill":string (each must-have),"status":"met"|"partial"|"missing","evidence":string}],"strengths":[{"point":string,"evidence":string}] (3-5),"gaps":[{"criterion":string,"severity":"low"|"medium"|"high","note":string}],"redFlags":string[] (e.g. short tenures, unexplained gaps, location/salary mismatch; empty if none),"interviewQuestions":[{"question":string,"purpose":string}] (4-6, targeted at probing gaps)}`,
-  outreach: `You are a top-performing agency recruiter writing personalized, non-generic cold outreach. Reference specific details from the candidate's background and why they fit THIS role. Warm, concise, no clichés, no emojis. Reply ONLY with a JSON object:
+  outreach: `You are a top-performing agency recruiter writing personalized, non-generic cold outreach. Reference specific details from the candidate's background and why they fit THIS role. Use a professional, direct tone. Be concise, avoid clichés and emojis, and do not use em dashes. Reply ONLY with a JSON object:
 {"linkedinConnect":string (max 280 chars),"inmail":{"subject":string,"body":string (120-180 words)},"emails":[{"day":integer,"subject":string,"body":string}] (exactly 3 follow-ups on days 3, 7, 14; each shorter than the previous)}
-Sign off as "Alex" from the agency. Do not reveal the client name if marked confidential; otherwise describe the company.`,
-  synthesize: `You are a senior agency recruiter turning phone-screen notes/transcripts into an executive candidate profile and a client-ready submission note. Only use facts from the transcript and CV; write "Not discussed" when unknown. Reply ONLY with a JSON object:
-{"headline":string,"executiveSummary":string (3-4 sentences),"highlights":string[] (4-6),"compensation":{"current":string,"expected":string},"availability":{"noticePeriod":string,"earliestStart":string},"cultureFit":string (2-3 sentences),"strengths":string[] (3-5),"concerns":string[],"submissionNote":{"subject":string,"body":string (polished email to the hiring manager, 180-260 words, with short bullet points, signed "Alex")}}`,
+Do not invent a sender name or signature. Do not reveal the client name if marked confidential; otherwise describe the company.`,
+  synthesize: `You are a senior agency recruiter turning phone-screen notes/transcripts into an executive candidate profile and a client-ready submission note. Only use facts from the transcript and CV; use a professional, direct tone and do not use em dashes; write "Not discussed" when unknown. Reply ONLY with a JSON object:
+{"headline":string,"executiveSummary":string (3-4 sentences),"highlights":string[] (4-6),"compensation":{"current":string,"expected":string},"availability":{"noticePeriod":string,"earliestStart":string},"cultureFit":string (2-3 sentences),"strengths":string[] (3-5),"concerns":string[],"submissionNote":{"subject":string,"body":string (polished email to the hiring manager, 180-260 words, with short bullet points, without an invented sender name or signature)}}`,
 };
 
 function buildContent(task: Task, p: any): any[] {
@@ -98,7 +100,7 @@ export async function callAI(task: Task, payload: unknown) {
   if (!text.trim()) throw new Error("The AI returned an empty response.");
   const cleaned = text.replace(/^```(?:json)?\s*/i, "").replace(/```\s*$/, "").trim();
   try {
-    return JSON.parse(cleaned);
+    return normalizeCopy(JSON.parse(cleaned));
   } catch {
     throw new Error("Could not read the AI response. Please try again.");
   }

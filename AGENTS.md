@@ -12,3 +12,4 @@
 - First account to sign up gets the admin (owner) role via handle_new_user trigger, which also seeds sample data per account. Why: owner sees everyone's data without hardcoding an email.
 - AI goes through runAI (requireSupabaseAuth) in src/lib/ai.functions.ts. Why: only signed-in users can spend AI credits.
 - Outreach sequence steps/timings live in src/lib/tracking.ts. Why: single source for due-date logic.
+- AI output and saved demo data pass through shared copy normalization before display. Why: previously saved and generated text must follow the app's no-em-dash copy rule.

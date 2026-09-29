@@ -14,10 +14,12 @@ export const Route = createFileRoute("/_authenticated/screening")({
   validateSearch: z.object({ candidate: z.string().optional(), job: z.string().optional() }),
   head: () => ({
     meta: [
-      { title: "Match Scorecard — Talentdesk" },
+      { title: "Match Scorecard | Talentdesk" },
       { name: "description", content: "Explainable AI match scorecards for candidates against open jobs." },
-      { property: "og:title", content: "Match Scorecard — Talentdesk" },
+      { property: "og:title", content: "Match Scorecard | Talentdesk" },
       { property: "og:description", content: "Explainable AI candidate-job matching." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: Screening,
@@ -50,7 +52,7 @@ function Screening() {
 
   return (
     <>
-      <PageHeader title="Match Scorecard" subtitle="Transparent, evidence-backed fit — not a black-box number." />
+      <PageHeader title="Match Scorecard" subtitle="Review evidence, strengths and gaps for each candidate." />
       <div className="mb-8 space-y-4 rounded-xl border bg-card p-5">
         <CandidateJobPicker
           candidateId={search.candidate} jobId={search.job}
@@ -59,7 +61,7 @@ function Screening() {
         />
         <GenerateButton loading={loading} disabled={!cand || !job} onClick={run}>{record ? "Re-score match" : "Score match"}</GenerateButton>
       </div>
-      {loading && !record ? <EmptyState text="Analysing CV against the job requirements…" /> : record ? <Scorecard r={record.result} /> : <EmptyState text="Pick a candidate and a job, then score the match." />}
+      {loading && !record ? <EmptyState text="Analyzing CV against the job requirements..." /> : record ? <Scorecard r={record.result} /> : <EmptyState text="Pick a candidate and a job, then score the match." />}
     </>
   );
 }

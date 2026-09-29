@@ -17,10 +17,12 @@ import { STAGES, type Job, type Stage } from "@/lib/types";
 export const Route = createFileRoute("/_authenticated/jobs/")({
   head: () => ({
     meta: [
-      { title: "Clients & Jobs — Talentdesk" },
+      { title: "Clients & Jobs | Talentdesk" },
       { name: "description", content: "Manage agency clients and open job requisitions in list or pipeline view." },
-      { property: "og:title", content: "Clients & Jobs — Talentdesk" },
+      { property: "og:title", content: "Clients & Jobs | Talentdesk" },
       { property: "og:description", content: "Manage agency clients and open job requisitions." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: Dashboard,
@@ -32,7 +34,7 @@ function Dashboard() {
   const [clientFilter, setClientFilter] = useState<string>("all");
   const [openOnly, setOpenOnly] = useState(false);
   const [sort, setSort] = useState<{ key: SortKey; dir: 1 | -1 } | null>(null);
-  const clientName = (id: string) => clients.find((c) => c.id === id)?.name ?? "—";
+  const clientName = (id: string) => clients.find((c) => c.id === id)?.name ?? "Not available";
   const stageIdx = (s: Stage) => STAGES.findIndex((x) => x.id === s);
   const shown = jobs
     .filter((j) => clientFilter === "all" || j.clientId === clientFilter)
@@ -65,7 +67,7 @@ function Dashboard() {
     <>
       <PageHeader
         title="Clients & Jobs"
-        subtitle="Your agency's book of business at a glance."
+        subtitle="Review clients, requisitions and pipeline status."
         action={
           <div className="flex gap-2">
             <NewClientDialog />

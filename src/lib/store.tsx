@@ -2,6 +2,7 @@ import { createContext, useCallback, useContext, useEffect, useState, type React
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { seedCandidates, seedClients, seedJobs, seedTranscripts } from "./seed";
+import { normalizeCopy } from "./copy";
 import type { Candidate, Client, Job, MatchRecord, MatchResult, Track, Transcript } from "./types";
 
 type Row = Record<string, any>;
@@ -85,7 +86,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     if (DEMO) {
       let d: Data | null = null;
       try { d = JSON.parse(localStorage.getItem(LS_KEY) || "null"); } catch {}
-      setData(d ?? demoSeed()); setUserId("demo"); setEmail("Demo workspace"); setIsAdmin(false); setLoading(false);
+      setData(normalizeCopy(d ?? demoSeed())); setUserId("demo"); setEmail("Demo workspace"); setIsAdmin(false); setLoading(false);
       return;
     }
     const { data: u } = await supabase.auth.getUser();
