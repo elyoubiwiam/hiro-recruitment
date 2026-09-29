@@ -7,3 +7,4 @@
 - [x] Reminders for next step (in-app only)
 - [x] Cleaner UI redesign ("Focused action cards" direction)
 - [x] Dashboard with recruitment KPIs and data-based next actions
+- [ ] Navbar icon: use the homepage Talentdesk mark (purple square with inner square) in AppShell
