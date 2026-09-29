@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useRef, useState } from "react";
-import { PanelRightOpen, FileSearch, GraduationCap, Mail, MapPin, Phone, Trash2, Upload } from "lucide-react";
+import { useMemo, useRef, useState } from "react";
+import { Filter, PanelRightOpen, FileSearch, GraduationCap, Mail, MapPin, Phone, Trash2, Upload, X } from "lucide-react";
 import { toast } from "sonner";
 import { PageHeader } from "@/components/AppShell";
 import { EmptyState, GenerateButton } from "@/components/shared";
@@ -8,6 +8,8 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
+import { Input } from "@/components/ui/input";
+import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuLabel, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { runAI } from "@/lib/ai.functions";
 import { extractFile } from "@/lib/file-extract";
 import { cvMeta, saveCvFile } from "@/lib/cv-files";
