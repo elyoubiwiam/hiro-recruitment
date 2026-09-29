@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowRight, BarChart3, BriefcaseBusiness, CalendarClock, CheckCheck, FileSearch, MessageSquareReply, PhoneCall, Users } from "lucide-react";
 import { PageHeader } from "@/components/AppShell";
+import { OutreachQueue } from "@/components/OutreachQueue";
 import { Button } from "@/components/ui/button";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import { useStore } from "@/lib/store";
@@ -89,7 +90,7 @@ function Dashboard() {
 
   return (
     <div className="space-y-8">
-      <PageHeader title="Dashboard" subtitle="Recruitment activity and next priorities across your workspace." />
+      <PageHeader title="Command Center" subtitle="Metrics, pipeline and the action queue in one place." />
       {loading ? (
         <p className="text-sm text-muted-foreground">Loading dashboard...</p>
       ) : (
@@ -179,6 +180,8 @@ function Dashboard() {
               </div>
             )}
           </section>
+
+          <OutreachQueue />
 
           <div className="grid gap-8 lg:grid-cols-[minmax(0,1.4fr)_minmax(280px,1fr)]">
             <section aria-labelledby="priorities-title" className="min-w-0">

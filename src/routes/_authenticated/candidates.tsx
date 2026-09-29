@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useRef, useState } from "react";
-import { FileSearch, GraduationCap, Mail, MapPin, Phone, Trash2, Upload } from "lucide-react";
+import { PanelRightOpen, FileSearch, GraduationCap, Mail, MapPin, Phone, Trash2, Upload } from "lucide-react";
 import { toast } from "sonner";
 import { PageHeader } from "@/components/AppShell";
 import { EmptyState, GenerateButton } from "@/components/shared";
@@ -11,6 +11,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { runAI } from "@/lib/ai.functions";
 import { extractFile } from "@/lib/file-extract";
 import { useStore } from "@/lib/store";
+import { useCandidateDrawer } from "@/components/CandidateDrawer";
 
 export const Route = createFileRoute("/_authenticated/candidates")({
   head: () => ({
@@ -28,6 +29,7 @@ export const Route = createFileRoute("/_authenticated/candidates")({
 
 function CandidatesPage() {
   const { candidates, addCandidate, deleteCandidate } = useStore();
+  const drawer = useCandidateDrawer();
   const [selected, setSelected] = useState<string | undefined>(candidates[0]?.id);
   const [text, setText] = useState("");
   const [loading, setLoading] = useState(false);
@@ -93,7 +95,7 @@ function CandidatesPage() {
       <div className="grid gap-6 lg:grid-cols-[320px_1fr]">
         <div className="space-y-2">
           {candidates.map((c) => (
-            <button key={c.id} onClick={() => setSelected(c.id)}
+            <button key={c.id} onClick={() => { setSelected(c.id); drawer.open(c.id); }}
               className={`w-full rounded-xl border bg-card p-3 text-left hover:border-primary ${current?.id === c.id ? "border-primary ring-1 ring-primary" : ""}`}>
               <div className="font-semibold">{c.name}</div>
               <div className="truncate text-sm text-muted-foreground">{c.headline}</div>
@@ -113,7 +115,8 @@ function CandidatesPage() {
                 </div>
               </div>
               <div className="flex gap-2">
-                <Button asChild size="sm"><Link to="/screening" search={{ candidate: current.id }}><FileSearch className="h-4 w-4" />Match to job</Link></Button>
+                <Button size="sm" onClick={() => drawer.open(current.id)}><PanelRightOpen className="h-4 w-4" />Open workspace</Button>
+                <Button asChild size="sm" variant="outline"><Link to="/screening" search={{ candidate: current.id }}><FileSearch className="h-4 w-4" />Match to job</Link></Button>
                 <Button size="sm" variant="ghost" onClick={() => {
                   deleteCandidate(current.id);
                   setSelected(undefined);
