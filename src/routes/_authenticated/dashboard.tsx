@@ -42,7 +42,7 @@ function Dashboard() {
     step: step.short,
     candidates: activeTracks.filter((track) => track.step === index).length,
   }));
-  const STEP_COLORS = ["var(--color-chart-1)", "var(--color-chart-2)", "var(--color-chart-3)", "var(--color-chart-4)", "var(--color-chart-5)"];
+  const STEP_COLORS = ["var(--color-chart-1)", "var(--color-chart-2)", "var(--color-chart-3)", "var(--color-chart-4)", "var(--color-chart-5)"] as const;
   const stepConfig = Object.fromEntries(STEPS.map((step, index) => [step.short, { label: step.label, color: STEP_COLORS[index] }]));
 
   const STATUS_COLORS: Record<Track["status"], string> = {
