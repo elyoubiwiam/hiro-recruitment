@@ -50,16 +50,16 @@ SUMMARY
 Backend engineer with 7 years building high-throughput data services in Go and Python. Led migration of a monolith to event-driven microservices at scale.
 
 EXPERIENCE
-Senior Software Engineer - Cartwheel Logistics (Mar 2021  to  Present)
+Senior Software Engineer, Cartwheel Logistics (Mar 2021 to Present)
 - Designed Go ingestion service handling 1.8B events/day on Kafka + PostgreSQL
 - Led 4-engineer squad migrating order pipeline to event sourcing; cut p99 latency 62%
 - Mentored 3 junior engineers; introduced RFC process
 
-Software Engineer - Parcelly (Jun 2018  to  Feb 2021)
+Software Engineer, Parcelly (Jun 2018 to Feb 2021)
 - Built Python/Django APIs and Celery workers on AWS (ECS, RDS, SQS)
 - Owned Postgres performance tuning; reduced infra costs 28%
 
-Junior Developer - Brightsoft Agency (Jul 2017  to  May 2018)
+Junior Developer, Brightsoft Agency (Jul 2017 to May 2018)
 - PHP/Laravel client projects
 
 EDUCATION
@@ -71,19 +71,19 @@ Go, Python, PostgreSQL, Kafka, AWS, Terraform, Docker, Kubernetes, gRPC, Redis`;
 const cv2 = `SAMIRA HADDAD
 Brooklyn, NY · samira.haddad@outlook.com · (917) 555-0192
 
-Enterprise Account Executive - payments-focused payments & fintech
+Enterprise Account Executive, payments and fintech
 
 EXPERIENCE
-Enterprise Account Executive - Ledgerline (Jan 2022  to  Present)
+Enterprise Account Executive, Ledgerline (Jan 2022 to Present)
 - 142% of $1.6M quota in FY23, 118% in FY24
 - Closed largest deal in company history: $780k ACV with national grocery chain
 - Run MEDDICC across 6-9 month cycles with CFOs and VPs Finance
 
-Mid-Market AE - Payvault (Aug 2019  to  Dec 2021)
+Mid-Market AE, Payvault (Aug 2019 to Dec 2021)
 - President's Club 2021; averaged $180k ACV
 - Built outbound playbook adopted by team of 12
 
-SDR → AE - Oracle NetSuite (Jun 2016  to  Jul 2019)
+SDR to AE, Oracle NetSuite (Jun 2016 to Jul 2019)
 
 EDUCATION
 B.A. Economics, Fordham University, 2016
@@ -95,16 +95,16 @@ const cv3 = `LEO TANAKA
 San Francisco, CA (open to relocation) · leo.tanaka@proton.me
 
 EXPERIENCE
-Staff Frontend Engineer - Quillhealth (2021  to  Present)
+Staff Frontend Engineer, Quillhealth (2021 to Present)
 - Frontend tech lead for 5 teams; defined React + TypeScript architecture for clinician portal
 - Drove WCAG 2.1 AA compliance program; passed third-party audit
 - Built shared component library used across web and React Native
 
-Senior Frontend Engineer - Loop Commerce (2018  to  2021)
+Senior Frontend Engineer, Loop Commerce (2018 to 2021)
 - Next.js storefront performance: LCP 4.1s → 1.6s
 
-Frontend Engineer - Kinetic (2016  to  2018)
-Frontend Engineer - Pixelbay (2015  to  2016)
+Frontend Engineer, Kinetic (2016 to 2018)
+Frontend Engineer, Pixelbay (2015 to 2016)
 
 EDUCATION
 B.S. Cognitive Science, UC San Diego, 2015
@@ -118,14 +118,14 @@ Remote, Denver, CO · ava@lindqvist.design · ava-lindqvist.com
 Product Designer focused on complex B2B workflows.
 
 EXPERIENCE
-Product Designer II - Metricly (2022  to  Present)
+Product Designer II, Metricly (2022 to Present)
 - Lead designer for dashboards & query builder used by 40k analysts
 - Co-created design system (180 components) in Figma with engineering
 
-Product Designer - Tandem HR (2020  to  2022)
+Product Designer, Tandem HR (2020 to 2022)
 - Redesigned onboarding; +23% activation
 
-UX Contractor (2019  to  2020) - various early-stage startups (4 month gap after)
+UX Contractor (2019 to 2020), various early-stage startups (4 month gap after)
 
 EDUCATION
 BFA Interaction Design, California College of the Arts, 2019
@@ -191,32 +191,32 @@ export const seedCandidates: Candidate[] = [
 
 export const seedTranscripts: Transcript[] = [
   {
-    id: "t1", candidateId: "p1", jobId: "j1", title: "Phone screen - Jordan Mello", createdAt: d(4),
-    text: `Recruiter (Alex): Thanks for jumping on, Jordan. What's prompting you to look?
-Jordan: Honestly Cartwheel is great but the platform work is basically done - I want another migration-scale problem. Northwind's 4B events/day is exactly that.
-Alex: Tell me about the Kafka migration.
+    id: "t1", candidateId: "p1", jobId: "j1", title: "Phone screen: Jordan Mello", createdAt: d(4),
+    text: `Recruiter: What is prompting you to consider a new role?
+Jordan: The platform work at Cartwheel is largely complete. I am interested in another migration-scale problem. Northwind's 4B events/day is relevant.
+Recruiter: Tell me about the Kafka migration.
 Jordan: I wrote the RFC, split the order pipeline into 9 services, ran dual-writes for 6 weeks, zero downtime cutover. p99 dropped 62%.
-Alex: Leadership?
+Recruiter: What is your leadership experience?
 Jordan: I'm the de facto tech lead for 4 engineers, run our design reviews, mentor 3 juniors. Not a people manager and don't want to be yet.
-Alex: Comp?
+Recruiter: What are your compensation expectations?
 Jordan: Base is $148k plus about 10% bonus. Looking for $165k base, flexible if equity is meaningful.
-Alex: Notice?
+Recruiter: What is your notice period?
 Jordan: Three weeks. Pre-booked vacation Nov 20 to 27.
-Alex: Hybrid in Austin OK?
+Recruiter: Would a hybrid schedule in Austin work for you?
 Jordan: Yes, I live 15 min from their office. Two days a week is ideal.
-Alex: Anything that would make you say no?
+Recruiter: What would prevent you from accepting the role?
 Jordan: Heavy on-call with no rotation. And I'd want to keep writing Go, not just reviewing.
 Notes: Very articulate, strong ownership stories, slightly less AWS depth than GCP; he said mostly AWS ECS, some EKS. Interviewing with one other company (final round).`,
   },
   {
-    id: "t2", candidateId: "p2", jobId: "j2", title: "Intro call - Samira Haddad", createdAt: d(1),
-    text: `Quick notes from 25 min call w/ Samira:
+    id: "t2", candidateId: "p2", jobId: "j2", title: "Intro call: Samira Haddad", createdAt: d(1),
+    text: `Notes from a 25-minute call with Samira:
 - Currently 118% to plan YTD at Ledgerline, but territory being cut in Q1 reorg - main reason for looking
 - Biggest win $780k ACV grocery chain, 8 month cycle, multi-threaded CFO + CIO + head of payments
 - Uses MEDDICC religiously, runs mutual action plans
 - Current OTE $240k (130 base), wants $150 base / $280k OTE - will consider $145 base with strong accelerators
 - 2 weeks notice, would like to start after Jan 6 to collect Q4 commission
-- Lives in Brooklyn, happy w/ 3 days in office
+- Lives in Brooklyn and is available to work in the office 3 days per week
 - Wants a team where enterprise isn't brand new - asked about Helio's existing enterprise logos
 - Energetic, crisp, very numbers-driven. Slight concern: never sold to marketplaces specifically`,
   },

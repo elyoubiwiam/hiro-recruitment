@@ -1,6 +1,6 @@
-type Task = "parse_cv" | "match" | "outreach" | "synthesize" | "step_draft";
-
 import { normalizeCopy } from "./copy";
+
+type Task = "parse_cv" | "match" | "outreach" | "synthesize" | "step_draft";
 
 const SYSTEM: Record<Task, string> = {
   step_draft: `You are a top-performing agency recruiter writing ONE message: the next step in a multi-step outreach sequence to a specific candidate for a specific role. Personalize with concrete details from the candidate's background and why they fit THIS role. Account for what was already sent (history) and do not repeat it; follow-ups should add a new angle and get shorter. Channel rules: "LinkedIn connection" max 280 chars, no subject; "InMail pitch" 120-180 words with subject; emails with subject, follow-ups 50-110 words, final check-in 40-70 words and gracefully closes the loop. Use a professional, direct tone. Be concise, avoid clichés and emojis, and do not use em dashes. Do not invent a sender name or signature. Reply ONLY with a JSON object: {"subject":string ("" for LinkedIn connection),"body":string}`,
