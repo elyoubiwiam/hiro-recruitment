@@ -14,3 +14,6 @@
 - Outreach sequence steps/timings live in src/lib/tracking.ts. Why: single source for due-date logic.
 - AI output and saved demo data pass through shared copy normalization before display. Why: previously saved and generated text must follow the app's no-em-dash copy rule.
 - Dashboard KPIs and recommendations derive from the current store and tracker status, without a separate analytics table. Why: metrics update immediately with recruiter activity and do not imply unsupported historical trends.
+- Candidate detail lives in one global CandidateDrawer (src/components/CandidateDrawer.tsx) opened via useCandidateDrawer(). Why: every page shares the same profile, scorecard, outreach and calls workflows.
+- AI results are cached: scorecards, drafts and syntheses persist in the store and are only regenerated on explicit click; parse/triage calls go through cachedAI (src/lib/ai-cache.ts). Why: viewing saved work must never spend AI credits.
+- Bulk triage uses one combined "triage" AI task (parse + score) per CV, and inputs are whitespace-collapsed and truncated in ai.server.ts. Why: halves requests and caps token usage.
