@@ -123,8 +123,8 @@ function Dashboard() {
                       <YAxis allowDecimals={false} tickLine={false} axisLine={false} fontSize={11} width={40} />
                       <ChartTooltip content={<ChartTooltipContent />} />
                       <Bar dataKey="candidates" radius={6} maxBarSize={40}>
-                        {stepData.map((entry, index) => (
-                          <Cell key={entry.step} fill={STEP_COLORS[index]} />
+                        {stepData.map((entry) => (
+                          <Cell key={entry.step} fill={entry.color} />
                         ))}
                       </Bar>
                     </BarChart>
