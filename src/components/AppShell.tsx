@@ -43,8 +43,12 @@ export function AppShell({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (loading || reminded.current || !email) return;
     reminded.current = true;
-    if (due > 0) toast(`${due} candidate${due > 1 ? "s" : ""} to contact today`, { description: "Review drafts in the outreach tracker." });
-  }, [loading, due, email]);
+    if (due > 0)
+      toast(`${due} candidate${due > 1 ? "s" : ""} to contact today`, {
+        description: "Review drafts in the outreach tracker.",
+        action: { label: "Open queue", onClick: () => navigate({ to: "/dashboard", hash: "queue" }) },
+      });
+  }, [loading, due, email, navigate]);
 
   if (PUBLIC.includes(path)) return <>{children}</>;
 
