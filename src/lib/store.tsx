@@ -1,7 +1,7 @@
 import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import { seedCandidates, seedClients, seedJobs, seedTranscripts } from "./seed";
+import { seedCandidates, seedClients, seedJobs, seedMatches, seedTranscripts } from "./seed";
 import { normalizeCopy } from "./copy";
 import type { Candidate, Client, Job, MatchRecord, MatchResult, Track, Transcript } from "./types";
 
@@ -20,7 +20,7 @@ interface Data {
   tracks: Track[];
 }
 const DEMO = true; // accounts disabled for now — data lives in this browser
-const LS_KEY = "talentdesk-demo-v1";
+const LS_KEY = "talentdesk-demo-v2";
 const hrs = (h: number) => new Date(Date.now() + h * 3600000).toISOString();
 function demoSeed(): Data {
   const t = (id: string, candidateId: string, jobId: string, step: number, next: string, history: number[]): Track => ({
@@ -29,7 +29,7 @@ function demoSeed(): Data {
     history: history.map((h, i) => ({ step: i, sentAt: hrs(-h) })), drafts: {}, notes: "", createdAt: hrs(-240),
   });
   return {
-    clients: seedClients, jobs: seedJobs, candidates: seedCandidates, matches: [],
+    clients: seedClients, jobs: seedJobs, candidates: seedCandidates, matches: seedMatches.map((x) => ({ ...x, createdAt: x.createdAt })),
     transcripts: seedTranscripts.map((x) => ({ ...x, result: x.result ?? null })),
     tracks: [
       t("k1", "p1", "j1", 2, hrs(-20), [120, 70]),
