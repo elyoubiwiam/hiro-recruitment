@@ -63,7 +63,7 @@ function Dashboard() {
   const matchData = jobs
     .map((job) => {
       const jobMatches = matches.filter((match) => match.jobId === job.id);
-      return { role: job.title, score: jobMatches.length ? Math.round(jobMatches.reduce((sum, match) => sum + match.score, 0) / jobMatches.length) : 0, screened: jobMatches.length > 0 };
+      return { role: job.title, score: jobMatches.length ? Math.round(jobMatches.reduce((sum, match) => sum + match.result.score, 0) / jobMatches.length) : 0, screened: jobMatches.length > 0 };
     })
     .filter((entry) => entry.screened)
     .slice(0, 6)
