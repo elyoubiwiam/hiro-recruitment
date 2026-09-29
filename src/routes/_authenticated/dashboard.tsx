@@ -119,7 +119,7 @@ function Dashboard() {
                   <ChartContainer config={stepConfig} className="mt-4 aspect-[16/10] w-full">
                     <BarChart data={stepData} margin={{ top: 8, right: 4, left: -24, bottom: 0 }}>
                       <CartesianGrid vertical={false} strokeDasharray="3 3" />
-                      <XAxis dataKey="step" tickLine={false} axisLine={false} tickMargin={8} fontSize={11} interval={0} />
+                      <XAxis dataKey="step" tickLine={false} axisLine={false} tickMargin={8} fontSize={10} interval={0} tickFormatter={(value: string) => (value === "Follow-up 1" ? "FU 1" : value === "Follow-up 2" ? "FU 2" : value)} />
                       <YAxis allowDecimals={false} tickLine={false} axisLine={false} fontSize={11} width={40} />
                       <ChartTooltip content={<ChartTooltipContent />} />
                       <Bar dataKey="candidates" radius={6} maxBarSize={40}>
