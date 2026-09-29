@@ -1,4 +1,4 @@
-import { Link, useRouterState } from "@tanstack/react-router";
+import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import { Briefcase, FileSearch, LayoutDashboard, LogOut, MessagesSquare, Moon, PhoneCall, ShieldCheck, Sun, Users } from "lucide-react";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { toast } from "sonner";
@@ -35,6 +35,7 @@ function useTheme() {
 
 export function AppShell({ children }: { children: ReactNode }) {
   const path = useRouterState({ select: (s) => s.location.pathname });
+  const navigate = useNavigate();
   const { tracks, email, isAdmin, loading } = useStore();
   const due = tracks.filter((t) => ["overdue", "today"].includes(bucketOf(t))).length;
   const reminded = useRef(false);
@@ -43,8 +44,12 @@ export function AppShell({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (loading || reminded.current || !email) return;
     reminded.current = true;
-    if (due > 0) toast(`${due} candidate${due > 1 ? "s" : ""} to contact today`, { description: "Review drafts in the outreach tracker." });
-  }, [loading, due, email]);
+    if (due > 0)
+      toast(`${due} candidate${due > 1 ? "s" : ""} to contact today`, {
+        description: "Review drafts in the outreach tracker.",
+        action: { label: "Open queue", onClick: () => navigate({ to: "/dashboard", hash: "queue" }) },
+      });
+  }, [loading, due, email, navigate]);
 
   if (PUBLIC.includes(path)) return <>{children}</>;
 
