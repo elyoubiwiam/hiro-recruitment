@@ -22,7 +22,7 @@ function Landing() {
   const navigate = useNavigate();
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
-      if (data.session) navigate({ to: "/today", replace: true });
+      if (data.session) navigate({ to: "/dashboard", replace: true });
     });
   }, [navigate]);
 
@@ -42,7 +42,7 @@ function Landing() {
           </div>
           <span className="text-lg font-bold tracking-tight">Talentdesk</span>
         </div>
-        <Button asChild variant="outline"><Link to="/today">Open workspace</Link></Button>
+        <Button asChild variant="outline"><Link to="/dashboard">Open workspace</Link></Button>
       </header>
       <section className="mx-auto max-w-5xl px-6 pb-20 pt-16">
         <span className="inline-flex items-center gap-1.5 rounded-full bg-accent px-3 py-1 text-xs font-semibold text-accent-foreground">
@@ -53,7 +53,7 @@ function Landing() {
           Talentdesk tracks every step of your candidate outreach and prepares a personalized message for the next one.
         </p>
         <div className="mt-8 flex flex-wrap items-center gap-3">
-          <Button asChild size="lg"><Link to="/today">Open the workspace <ArrowRight className="h-4 w-4" /></Link></Button>
+          <Button asChild size="lg"><Link to="/dashboard">Open the workspace <ArrowRight className="h-4 w-4" /></Link></Button>
           <Button asChild size="lg" variant="outline"><Link to="/dashboard">See the dashboard</Link></Button>
         </div>
         <p className="mt-4 max-w-xl text-sm text-muted-foreground">

@@ -7,7 +7,7 @@ import { bucketOf } from "@/lib/tracking";
 
 const NAV = [
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { to: "/today", label: "Today", icon: CalendarCheck },
+  { to: "/dashboard", label: "Today", icon: CalendarCheck },
   { to: "/jobs", label: "Clients & Jobs", icon: Briefcase },
   { to: "/candidates", label: "Candidates", icon: Users },
   { to: "/screening", label: "Match Scorecard", icon: FileSearch },
@@ -75,7 +75,7 @@ export function AppShell({ children }: { children: ReactNode }) {
               >
                 <n.icon className="h-4 w-4" />
                 <span className="flex-1">{n.label}</span>
-                {n.to === "/today" && due > 0 && (
+                {n.to === "/dashboard" && due > 0 && (
                   <span className="rounded-full bg-destructive px-1.5 text-[10px] font-bold text-destructive-foreground">{due}</span>
                 )}
               </Link>
