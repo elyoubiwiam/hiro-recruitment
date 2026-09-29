@@ -94,7 +94,84 @@ function Dashboard() {
             <Metric icon={FileSearch} label="Roles screened" value={`${openJobs.length - jobsWithoutMatches.length}/${openJobs.length}`} context="Open roles with a saved scorecard" to="/screening" />
           </section>
 
-          <div className="grid gap-8 lg:grid-cols-[minmax(0,1.4fr)_minmax(280px,1fr)]">
+          <section aria-labelledby="charts-title">
+            <div className="mb-4 flex items-center justify-between gap-3">
+              <div>
+                <h2 id="charts-title" className="text-xl font-semibold">Pipeline charts</h2>
+                <p className="mt-1 text-sm text-muted-foreground">How your outreach and screening work is distributed right now.</p>
+              </div>
+              <BarChart3 className="h-5 w-5 text-muted-foreground" />
+            </div>
+            {loading || !hasChartData ? (
+              <p className="text-sm text-muted-foreground">{loading ? "Loading charts..." : "Charts appear once you have candidates in outreach or saved scorecards."}</p>
+            ) : (
+              <div className="grid gap-4 lg:grid-cols-3">
+                <div className="rounded-lg border bg-card p-5">
+                  <h3 className="text-sm font-semibold">Active sequences by step</h3>
+                  <p className="mt-0.5 text-xs text-muted-foreground">Where waiting candidates sit in the sequence.</p>
+                  <ChartContainer config={stepConfig} className="mt-4 aspect-[16/10] w-full">
+                    <BarChart data={stepData} margin={{ top: 8, right: 4, left: -24, bottom: 0 }}>
+                      <CartesianGrid vertical={false} strokeDasharray="3 3" />
+                      <XAxis dataKey="step" tickLine={false} axisLine={false} tickMargin={8} fontSize={11} interval={0} />
+                      <YAxis allowDecimals={false} tickLine={false} axisLine={false} fontSize={11} width={40} />
+                      <ChartTooltip content={<ChartTooltipContent />} />
+                      <Bar dataKey="candidates" radius={6} maxBarSize={40}>
+                        {stepData.map((entry, index) => (
+                          <Cell key={entry.step} fill={STEP_COLORS[index]} />
+                        ))}
+                      </Bar>
+                    </BarChart>
+                  </ChartContainer>
+                </div>
+
+                <div className="rounded-lg border bg-card p-5">
+                  <h3 className="text-sm font-semibold">Sequence outcomes</h3>
+                  <p className="mt-0.5 text-xs text-muted-foreground">Results across all tracked candidates.</p>
+                  <div className="relative mt-4">
+                    <ChartContainer config={statusConfig} className="mx-auto aspect-square w-full max-w-[220px]">
+                      <PieChart>
+                        <ChartTooltip content={<ChartTooltipContent hideLabel />} />
+                        <Pie data={statusData} dataKey="value" nameKey="key" innerRadius={58} outerRadius={88} strokeWidth={2}>
+                          {statusData.map((entry) => (
+                            <Cell key={entry.key} fill={statusConfig[entry.key as keyof typeof statusConfig].color} />
+                          ))}
+                        </Pie>
+                      </PieChart>
+                    </ChartContainer>
+                    <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
+                      <span className="font-mono text-2xl font-semibold">{statusTotal}</span>
+                      <span className="text-xs text-muted-foreground">tracked</span>
+                    </div>
+                  </div>
+                  <dl className="mt-4 space-y-1.5">
+                    {statusData.map((entry) => (
+                      <div key={entry.key} className="flex items-center justify-between text-xs">
+                        <dt className="flex items-center gap-2 text-muted-foreground">
+                          <span className="h-2.5 w-2.5 rounded-full" style={{ background: statusConfig[entry.key as keyof typeof statusConfig].color }} />
+                          {statusConfig[entry.key as keyof typeof statusConfig].label}
+                        </dt>
+                        <dd className="font-mono font-semibold">{entry.value}</dd>
+                      </div>
+                    ))}
+                  </dl>
+                </div>
+
+                <div className="rounded-lg border bg-card p-5">
+                  <h3 className="text-sm font-semibold">Average match score by role</h3>
+                  <p className="mt-0.5 text-xs text-muted-foreground">Saved scorecards only, scaled to 100.</p>
+                  <ChartContainer config={matchConfig} className="mt-4 aspect-[16/10] w-full">
+                    <BarChart data={matchData} layout="vertical" margin={{ top: 4, right: 12, left: 8, bottom: 0 }}>
+                      <CartesianGrid horizontal={false} strokeDasharray="3 3" />
+                      <XAxis type="number" domain={[0, 100]} tickLine={false} axisLine={false} fontSize={11} />
+                      <YAxis type="category" dataKey="role" tickLine={false} axisLine={false} fontSize={11} width={110} tickFormatter={(value: string) => (value.length > 16 ? `${value.slice(0, 15)}…` : value)} />
+                      <ChartTooltip content={<ChartTooltipContent />} />
+                      <Bar dataKey="score" radius={6} maxBarSize={22} />
+                    </BarChart>
+                  </ChartContainer>
+                </div>
+              </div>
+            )}
+          </section>
             <section aria-labelledby="priorities-title" className="min-w-0">
               <div className="mb-4 flex items-center justify-between gap-3">
                 <div>
