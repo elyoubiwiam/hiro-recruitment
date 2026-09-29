@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { useStore } from "@/lib/store";
 import { bucketOf } from "@/lib/tracking";
 import { CandidateDrawerProvider } from "@/components/CandidateDrawer";
+import { clearCvFiles } from "@/lib/cv-files";
 
 const NAV = [
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
@@ -88,7 +89,7 @@ export function AppShell({ children }: { children: ReactNode }) {
           {isAdmin && (
             <div className="flex items-center gap-1 text-accent-foreground"><ShieldCheck className="h-3.5 w-3.5" />Owner · access to all accounts</div>
           )}
-          <button onClick={() => { localStorage.removeItem("talentdesk-demo-v1"); location.reload(); }} className="flex items-center gap-1.5 text-muted-foreground hover:text-foreground">
+          <button onClick={() => { localStorage.removeItem("talentdesk-demo-v2"); localStorage.removeItem("talentdesk-ai-cache-v1"); clearCvFiles().finally(() => location.reload()); }} className="flex items-center gap-1.5 text-muted-foreground hover:text-foreground">
             <LogOut className="h-3.5 w-3.5" />Reset example data
           </button>
         </div>

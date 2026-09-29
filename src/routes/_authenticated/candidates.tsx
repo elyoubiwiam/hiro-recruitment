@@ -10,6 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { runAI } from "@/lib/ai.functions";
 import { extractFile } from "@/lib/file-extract";
+import { cvMeta, saveCvFile } from "@/lib/cv-files";
 import { useStore } from "@/lib/store";
 import { useCandidateDrawer } from "@/components/CandidateDrawer";
 
@@ -36,7 +37,7 @@ function CandidatesPage() {
   const fileRef = useRef<HTMLInputElement>(null);
   const current = candidates.find((c) => c.id === selected) ?? candidates[0];
 
-  async function parse(payload: { text?: string; fileData?: string; filename?: string }) {
+  async function parse(payload: { text?: string; fileData?: string; filename?: string }, file?: File) {
     setLoading(true);
     try {
       const r = await runAI({ data: { task: "parse_cv", payload } });
@@ -45,8 +46,10 @@ function CandidatesPage() {
         location: r.location || "", headline: r.headline || "", summary: r.summary || "",
         skills: r.skills || [], experience: r.experience || [], education: r.education || [],
         rawText: payload.text || r.rawText || "",
+        cvFile: file ? cvMeta(file) : undefined,
       });
       if (!cand) return;
+      if (file) await saveCvFile(cand.id, file).catch(() => toast.error("Profile saved, but the CV file could not be stored."));
       setSelected(cand.id);
       setText("");
       toast.success(`Parsed ${cand.name}`);
@@ -60,7 +63,7 @@ function CandidatesPage() {
   async function onFile(file?: File) {
     if (!file) return;
     try {
-      await parse(await extractFile(file));
+      await parse(await extractFile(file), file);
     } catch {
       toast.error("Could not read that file. Try PDF, DOCX or TXT.");
     }
@@ -117,7 +120,8 @@ function CandidatesPage() {
               <div className="flex gap-2">
                 <Button size="sm" onClick={() => drawer.open(current.id)}><PanelRightOpen className="h-4 w-4" />Open workspace</Button>
                 <Button asChild size="sm" variant="outline"><Link to="/screening" search={{ candidate: current.id }}><FileSearch className="h-4 w-4" />Match to job</Link></Button>
-                <Button size="sm" variant="ghost" onClick={() => {
+                <Button size="sm" variant="ghost" aria-label="Delete candidate" onClick={() => {
+                  if (!confirm(`Delete ${current.name}? Their CV file, scorecards, outreach and call notes will also be deleted.`)) return;
                   deleteCandidate(current.id);
                   setSelected(undefined);
                 }}><Trash2 className="h-4 w-4" /></Button>

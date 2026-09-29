@@ -3,6 +3,8 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { seedCandidates, seedClients, seedJobs, seedMatches, seedTranscripts } from "./seed";
 import { normalizeCopy } from "./copy";
+import { deleteCvFile } from "./cv-files";
+import { forgetAI } from "./ai-cache";
 import type { Candidate, Client, Job, MatchRecord, MatchResult, Track, Transcript } from "./types";
 
 type Row = Record<string, any>;
@@ -163,8 +165,19 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       return r;
     },
     deleteCandidate: async (id) => {
-      setData((d) => ({ ...d, candidates: d.candidates.filter((c) => c.id !== id), tracks: d.tracks.filter((t) => t.candidateId !== id) }));
+      const gone = data.candidates.find((c) => c.id === id);
+      setData((d) => ({
+        ...d,
+        candidates: d.candidates.filter((c) => c.id !== id),
+        tracks: d.tracks.filter((t) => t.candidateId !== id),
+        matches: d.matches.filter((m) => m.candidateId !== id),
+        transcripts: d.transcripts.filter((t) => t.candidateId !== id),
+        triage: Object.fromEntries(Object.entries(d.triage).filter(([k]) => !k.startsWith(`${id}:`))),
+      }));
+      await deleteCvFile(id);
+      if (gone) forgetAI([gone.name, gone.email, gone.phone]);
       if (DEMO) return;
+      await Promise.all(["outreach_tracks", "matches", "transcripts"].map((t) => supabase.from(t as any).delete().eq("candidate_id", id)));
       const { error } = await supabase.from("candidates").delete().eq("id", id);
       fail(error);
     },

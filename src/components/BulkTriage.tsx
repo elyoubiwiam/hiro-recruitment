@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { cachedAI } from "@/lib/ai-cache";
 import { extractFile } from "@/lib/file-extract";
+import { cvMeta, saveCvFile } from "@/lib/cv-files";
 import { triageKey, useStore } from "@/lib/store";
 import type { Job, MatchResult } from "@/lib/types";
 
@@ -42,10 +43,11 @@ export function BulkTriage({ job }: { job: Job }) {
             cand = (await addCandidate({
               name: p.name || f.name.replace(/\.\w+$/, ""), email: p.email || "", phone: p.phone || "", location: p.location || "",
               headline: p.headline || "", summary: p.summary || "", skills: p.skills || [], experience: p.experience || [],
-              education: p.education || [], rawText: ex.text?.slice(0, 20000) || "",
+              education: p.education || [], rawText: ex.text?.slice(0, 20000) || "", cvFile: cvMeta(f),
             })) ?? undefined;
             if (cand) known.push(cand);
           }
+          if (cand) await saveCvFile(cand.id, f).catch(() => {});
           if (cand && r.match) await saveMatch(cand.id, job.id, r.match);
           set(f.name, { state: "done" });
         } catch (e) {
