@@ -1,44 +1,70 @@
 import { normalizeCopy } from "./copy";
 
-type Task = "parse_cv" | "match" | "outreach" | "synthesize" | "step_draft";
+export type Task = "parse_cv" | "match" | "outreach" | "synthesize" | "step_draft" | "triage";
+
+// Shared style rule, kept short to save input tokens on every call.
+const STYLE = 'Professional, direct, concise. No clichés, emojis, em dashes, invented facts or signatures. Use "" if unknown. Reply ONLY with JSON.';
+const PROFILE = '{"name","email","phone","location","headline":"title @ company","summary":"2 sentences","skills":[max 15],"experience":[{"title","company","start","end","highlights":[max 3]}],"education":[{"degree","school","year"}]}';
+const MATCH = '{"score":0-100,"verdict":"Strong match|Good match|Partial match|Weak match","summary":"2 sentences","skillCoverage":[{"skill":each must-have,"status":"met|partial|missing","evidence"}],"strengths":[{"point","evidence"}] 3,"gaps":[{"criterion","severity":"low|medium|high","note"}],"redFlags":[string],"interviewQuestions":[{"question","purpose"}] 4}';
 
 const SYSTEM: Record<Task, string> = {
-  step_draft: `You are a top-performing agency recruiter writing ONE message: the next step in a multi-step outreach sequence to a specific candidate for a specific role. Personalize with concrete details from the candidate's background and why they fit THIS role. Account for what was already sent (history) and do not repeat it; follow-ups should add a new angle and get shorter. Channel rules: "LinkedIn connection" max 280 chars, no subject; "InMail pitch" 120-180 words with subject; emails with subject, follow-ups 50-110 words, final check-in 40-70 words and gracefully closes the loop. Use a professional, direct tone. Be concise, avoid clichés and emojis, and do not use em dashes. Do not invent a sender name or signature. Reply ONLY with a JSON object: {"subject":string ("" for LinkedIn connection),"body":string}`,
-  parse_cv: `You are an expert recruitment CV parser. Extract a structured candidate profile and reply ONLY with a JSON object:
-{"name":string,"email":string,"phone":string,"location":string,"headline":string (current title @ company),"summary":string (2-3 sentences),"skills":string[] (max 20, normalized),"experience":[{"title":string,"company":string,"start":string,"end":string,"highlights":string[]}],"education":[{"degree":string,"school":string,"year":string}],"rawText":string (plain-text transcription of the CV, max 4000 chars)}
-Use "" for unknown fields. Never invent facts. Use a professional, direct tone and do not use em dashes.`,
-  match: `You are a senior agency recruiter producing a transparent, explainable match scorecard of a candidate against a job. Be rigorous and evidence-based. Use a professional, direct tone and do not use em dashes: cite concrete evidence from the CV. Reply ONLY with a JSON object:
-{"score":integer 0-100,"verdict":"Strong match"|"Good match"|"Partial match"|"Weak match","summary":string (2-3 sentences),"skillCoverage":[{"skill":string (each must-have),"status":"met"|"partial"|"missing","evidence":string}],"strengths":[{"point":string,"evidence":string}] (3-5),"gaps":[{"criterion":string,"severity":"low"|"medium"|"high","note":string}],"redFlags":string[] (e.g. short tenures, unexplained gaps, location/salary mismatch; empty if none),"interviewQuestions":[{"question":string,"purpose":string}] (4-6, targeted at probing gaps)}`,
-  outreach: `You are a top-performing agency recruiter writing personalized, non-generic cold outreach. Reference specific details from the candidate's background and why they fit THIS role. Use a professional, direct tone. Be concise, avoid clichés and emojis, and do not use em dashes. Reply ONLY with a JSON object:
-{"linkedinConnect":string (max 280 chars),"inmail":{"subject":string,"body":string (120-180 words)},"emails":[{"day":integer,"subject":string,"body":string}] (exactly 3 follow-ups on days 3, 7, 14; each shorter than the previous)}
-Do not invent a sender name or signature. Do not reveal the client name if marked confidential; otherwise describe the company.`,
-  synthesize: `You are a senior agency recruiter turning phone-screen notes/transcripts into an executive candidate profile and a client-ready submission note. Only use facts from the transcript and CV; use a professional, direct tone and do not use em dashes; write "Not discussed" when unknown. Reply ONLY with a JSON object:
-{"headline":string,"executiveSummary":string (3-4 sentences),"highlights":string[] (4-6),"compensation":{"current":string,"expected":string},"availability":{"noticePeriod":string,"earliestStart":string},"cultureFit":string (2-3 sentences),"strengths":string[] (3-5),"concerns":string[],"submissionNote":{"subject":string,"body":string (polished email to the hiring manager, 180-260 words, with short bullet points, without an invented sender name or signature)}}`,
+  parse_cv: `Parse the CV. ${STYLE} Shape: ${PROFILE}`,
+  match: `Score the candidate against the job with cited CV evidence. ${STYLE} Shape: ${MATCH}`,
+  triage: `Parse the CV, then score it against the job with cited evidence. ${STYLE} Shape: {"profile":${PROFILE},"match":${MATCH}}`,
+  step_draft: `Write ONE personalized outreach message for the given sequence step, using concrete fit details. Do not repeat ALREADY SENT; follow-ups add a new angle and get shorter. Limits: LinkedIn connection 280 chars, no subject; InMail 120-160 words; follow-ups 50-100 words; final 40-70 words, closes the loop. ${STYLE} Shape: {"subject":"" for LinkedIn,"body"}`,
+  outreach: `Write a personalized cold outreach sequence. Hide client name if confidential. ${STYLE} Shape: {"linkedinConnect":max 280 chars,"inmail":{"subject","body":120-160 words},"emails":[{"day":3|7|14,"subject","body"}] 3, each shorter}`,
+  synthesize: `Turn call notes into an executive profile and client submission note. Only use given facts; write "Not discussed" if unknown. ${STYLE} Shape: {"headline","executiveSummary":"3 sentences","highlights":[4-5],"compensation":{"current","expected"},"availability":{"noticePeriod","earliestStart"},"cultureFit":"2 sentences","strengths":[3-4],"concerns":[string],"submissionNote":{"subject","body":160-220 words with short bullets}}`,
 };
 
+const LIMITS = { cv: 6000, doc: 12000, transcript: 10000, description: 1500 };
+
+/** Collapse whitespace and cut oversized text before it reaches the model. */
+export function squeeze(s: unknown, max: number): string {
+  const t = String(s ?? "").replace(/[ \t]+/g, " ").replace(/\s*\n\s*/g, "\n").replace(/\n{2,}/g, "\n").trim();
+  return t.length > max ? `${t.slice(0, max)}\n[truncated]` : t;
+}
+
+function compactJob(job: any) {
+  if (!job) return {};
+  const { id, clientId, createdAt, stage, ...rest } = job;
+  return { ...rest, description: squeeze(job.description, LIMITS.description) };
+}
+function compactCandidate(c: any) {
+  if (!c) return {};
+  const { id, createdAt, rawText, cv, email, phone, ...rest } = c;
+  return { ...rest, cv: squeeze(cv ?? rawText, LIMITS.cv) };
+}
+const j = (o: unknown) => JSON.stringify(o);
+
 function buildContent(task: Task, p: any): any[] {
-  if (task === "parse_cv") {
+  if (task === "parse_cv" || task === "triage") {
+    const jobCtx = task === "triage" ? `JOB:${j(compactJob(p.job))}\n` : "";
     if (p.fileData) {
       return [
         { type: "input_file", filename: p.filename || "cv.pdf", file_data: p.fileData },
-        { type: "input_text", text: "Parse this CV into the JSON profile." },
+        { type: "input_text", text: `${jobCtx}Return the JSON.` },
       ];
     }
-    return [{ type: "input_text", text: `Parse this CV into the JSON profile:\n\n${p.text}` }];
+    return [{ type: "input_text", text: `${jobCtx}CV:\n${squeeze(p.text, LIMITS.doc)}` }];
   }
-  const ctx = `JOB:\n${JSON.stringify(p.job, null, 2)}\n\nCLIENT:\n${JSON.stringify(p.client ?? {}, null, 2)}\n\nCANDIDATE:\n${JSON.stringify(p.candidate, null, 2)}`;
+  const client = p.client ? { name: p.client.name, industry: p.client.industry } : {};
+  const ctx = `JOB:${j(compactJob(p.job))}\nCLIENT:${j(client)}\nCANDIDATE:${j(compactCandidate(p.candidate))}`;
   if (task === "step_draft") {
-    return [{ type: "input_text", text: `${ctx}\n\nSTEP TO WRITE: ${JSON.stringify(p.step)}\n\nALREADY SENT: ${JSON.stringify(p.history ?? [])}\n\nProduce the JSON.` }];
+    const history = (p.history ?? []).map((h: any) => ({ step: h.step, message: squeeze(h.message, 600) }));
+    return [{ type: "input_text", text: `${ctx}\nSTEP:${j(p.step)}\nALREADY SENT:${j(history)}` }];
   }
   if (task === "synthesize") {
-    return [{ type: "input_text", text: `${ctx}\n\nCALL TRANSCRIPT / NOTES:\n${p.transcript}\n\nProduce the JSON.` }];
+    return [{ type: "input_text", text: `${ctx}\nNOTES:\n${squeeze(p.transcript, LIMITS.transcript)}` }];
   }
-  return [{ type: "input_text", text: `${ctx}\n\nProduce the JSON.` }];
+  return [{ type: "input_text", text: ctx }];
 }
 
-export async function callAI(task: Task, payload: unknown) {
+export async function callAI(task: Task, payload: any) {
   const key = process.env['LOVABLE_API_KEY'];
   if (!key) throw new Error("AI is not configured for this project.");
+  if (payload?.fileData && String(payload.fileData).length > 6_000_000) {
+    throw new Error("This file is too large. Upload a CV under 4 MB.");
+  }
 
   const res = await fetch("https://ai.gateway.lovable.dev/v1/responses", {
     method: "POST",
@@ -63,7 +89,8 @@ export async function callAI(task: Task, payload: unknown) {
     const body = await res.text().catch(() => "");
     let msg = "";
     try {
-      msg = JSON.parse(body)?.error?.message ?? JSON.parse(body)?.message ?? "";
+      const parsed = JSON.parse(body);
+      msg = parsed?.error?.message ?? parsed?.message ?? "";
     } catch {}
     if (res.status === 402) throw new Error(msg || "AI credits exhausted. Add credits in Settings → Plans & credits.");
     if (res.status === 429) throw new Error("Too many AI requests right now. Please wait a moment and try again.");

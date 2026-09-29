@@ -35,7 +35,7 @@ function ResetPassword() {
           setBusy(false);
           if (error) { toast.error(error.message); return; }
           toast.success("Password updated");
-          navigate({ to: "/today", replace: true });
+          navigate({ to: "/dashboard", replace: true });
         }}
       >
         <h1 className="text-xl">Set a new password</h1>

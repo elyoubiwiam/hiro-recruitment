@@ -1,13 +1,13 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { Briefcase, CalendarCheck, FileSearch, LayoutDashboard, LogOut, MessagesSquare, Moon, PhoneCall, ShieldCheck, Sun, Users } from "lucide-react";
+import { Briefcase, FileSearch, LayoutDashboard, LogOut, MessagesSquare, Moon, PhoneCall, ShieldCheck, Sun, Users } from "lucide-react";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { toast } from "sonner";
 import { useStore } from "@/lib/store";
 import { bucketOf } from "@/lib/tracking";
+import { CandidateDrawerProvider } from "@/components/CandidateDrawer";
 
 const NAV = [
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { to: "/today", label: "Today", icon: CalendarCheck },
   { to: "/jobs", label: "Clients & Jobs", icon: Briefcase },
   { to: "/candidates", label: "Candidates", icon: Users },
   { to: "/screening", label: "Match Scorecard", icon: FileSearch },
@@ -49,6 +49,7 @@ export function AppShell({ children }: { children: ReactNode }) {
 
 
   return (
+    <CandidateDrawerProvider>
     <div className="flex min-h-screen">
       <aside className="sticky top-0 hidden h-screen w-64 shrink-0 flex-col border-r bg-sidebar p-5 md:flex">
         <div className="mb-8 flex items-center gap-2.5 px-2">
@@ -75,7 +76,7 @@ export function AppShell({ children }: { children: ReactNode }) {
               >
                 <n.icon className="h-4 w-4" />
                 <span className="flex-1">{n.label}</span>
-                {n.to === "/today" && due > 0 && (
+                {n.to === "/dashboard" && due > 0 && (
                   <span className="rounded-full bg-destructive px-1.5 text-[10px] font-bold text-destructive-foreground">{due}</span>
                 )}
               </Link>
@@ -110,6 +111,7 @@ export function AppShell({ children }: { children: ReactNode }) {
         <main className="mx-auto w-full max-w-6xl flex-1 p-6 md:p-10">{children}</main>
       </div>
     </div>
+    </CandidateDrawerProvider>
   );
 }
 

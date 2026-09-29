@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowRight, BarChart3, BriefcaseBusiness, CalendarClock, CheckCheck, FileSearch, MessageSquareReply, PhoneCall, Users } from "lucide-react";
 import { PageHeader } from "@/components/AppShell";
+import { OutreachQueue } from "@/components/OutreachQueue";
 import { Button } from "@/components/ui/button";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import { useStore } from "@/lib/store";
@@ -80,8 +81,8 @@ function Dashboard() {
   const hasChartData = activeTracks.length > 0 || tracks.length > 0 || matchData.length > 0;
 
   const recommendations = [
-    ...(overdue ? [{ key: "overdue", title: `Contact ${overdue} overdue candidate${overdue === 1 ? "" : "s"}`, detail: "Review the next message before sending to avoid further delay.", to: "/today" as const, label: "Review outreach", urgency: "High priority" }] : []),
-    ...(dueToday ? [{ key: "today", title: `Contact ${dueToday} candidate${dueToday === 1 ? "" : "s"} due today`, detail: "Send the scheduled message and record the outcome.", to: "/today" as const, label: "Open tracker", urgency: "Due today" }] : []),
+    ...(overdue ? [{ key: "overdue", title: `Contact ${overdue} overdue candidate${overdue === 1 ? "" : "s"}`, detail: "Review the next message before sending to avoid further delay.", to: "/dashboard" as const, label: "Review outreach", urgency: "High priority" }] : []),
+    ...(dueToday ? [{ key: "today", title: `Contact ${dueToday} candidate${dueToday === 1 ? "" : "s"} due today`, detail: "Send the scheduled message and record the outcome.", to: "/dashboard" as const, label: "Open tracker", urgency: "Due today" }] : []),
     ...(jobsWithoutMatches.length ? [{ key: "screening", title: `Screen candidates for ${jobsWithoutMatches.length} open role${jobsWithoutMatches.length === 1 ? "" : "s"}`, detail: "These roles have no saved match scorecards yet. Start with a relevant candidate.", to: "/screening" as const, label: "Start screening", urgency: "Coverage gap" }] : []),
     ...(jobsWithoutOutreach.length ? [{ key: "sourcing", title: `Start outreach for ${jobsWithoutOutreach.length} open role${jobsWithoutOutreach.length === 1 ? "" : "s"}`, detail: "No active candidate sequences are linked to these roles.", to: "/outreach" as const, label: "Prepare outreach", urgency: "Sourcing gap" }] : []),
     ...(callsToSynthesize ? [{ key: "calls", title: `Prepare ${callsToSynthesize} client submission${callsToSynthesize === 1 ? "" : "s"}`, detail: "Call notes are available but have not been turned into submission notes.", to: "/calls" as const, label: "Review calls", urgency: "Ready for review" }] : []),
@@ -89,15 +90,15 @@ function Dashboard() {
 
   return (
     <div className="space-y-8">
-      <PageHeader title="Dashboard" subtitle="Recruitment activity and next priorities across your workspace." />
+      <PageHeader title="Command Center" subtitle="Metrics, pipeline and the action queue in one place." />
       {loading ? (
         <p className="text-sm text-muted-foreground">Loading dashboard...</p>
       ) : (
         <>
           <section aria-label="Key performance indicators" className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
             <Metric icon={BriefcaseBusiness} label="Open roles" value={openJobs.length} context={`Across ${clients.length} clients`} to="/jobs" />
-            <Metric icon={CalendarClock} label="Outreach due" value={overdue + dueToday} context={`${overdue} overdue · ${dueToday} due today`} to="/today" emphasis={overdue > 0} />
-            <Metric icon={MessageSquareReply} label="Response rate" value={responseRate === null ? "Not available" : `${responseRate}%`} context={`${answered} replies or calls booked / ${contacted.length} contacted sequences`} to="/today" />
+            <Metric icon={CalendarClock} label="Outreach due" value={overdue + dueToday} context={`${overdue} overdue · ${dueToday} due today`} to="/dashboard" emphasis={overdue > 0} />
+            <Metric icon={MessageSquareReply} label="Response rate" value={responseRate === null ? "Not available" : `${responseRate}%`} context={`${answered} replies or calls booked / ${contacted.length} contacted sequences`} to="/dashboard" />
             <Metric icon={FileSearch} label="Roles screened" value={`${openJobs.length - jobsWithoutMatches.length}/${openJobs.length}`} context="Open roles with a saved scorecard" to="/screening" />
           </section>
 
@@ -180,6 +181,8 @@ function Dashboard() {
             )}
           </section>
 
+          <OutreachQueue />
+
           <div className="grid gap-8 lg:grid-cols-[minmax(0,1.4fr)_minmax(280px,1fr)]">
             <section aria-labelledby="priorities-title" className="min-w-0">
               <div className="mb-4 flex items-center justify-between gap-3">
@@ -248,7 +251,7 @@ function Dashboard() {
 }
 
 function Metric({ icon: Icon, label, value, context, to, emphasis = false }: {
-  icon: typeof BriefcaseBusiness; label: string; value: string | number; context: string; to: "/jobs" | "/today" | "/screening"; emphasis?: boolean;
+  icon: typeof BriefcaseBusiness; label: string; value: string | number; context: string; to: "/jobs" | "/dashboard" | "/screening"; emphasis?: boolean;
 }) {
   return (
     <Link to={to} className="group flex min-h-36 flex-col justify-between rounded-lg border bg-card p-5 transition-colors hover:border-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">

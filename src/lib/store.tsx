@@ -18,7 +18,10 @@ interface Data {
   matches: MatchRecord[];
   transcripts: Transcript[];
   tracks: Track[];
+  triage: Record<string, TriageStatus>;
 }
+export type TriageStatus = "shortlisted" | "rejected";
+export const triageKey = (candidateId: string, jobId: string) => `${candidateId}:${jobId}`;
 const DEMO = true; // accounts disabled for now — data lives in this browser
 const LS_KEY = "talentdesk-demo-v2";
 const hrs = (h: number) => new Date(Date.now() + h * 3600000).toISOString();
@@ -36,10 +39,11 @@ function demoSeed(): Data {
       t("k2", "p2", "j2", 1, hrs(3), [40]),
       t("k3", "p3", "j1", 0, hrs(50), []),
     ],
+    triage: {},
   };
 }
 const uid = () => (crypto as any).randomUUID?.() ?? Math.random().toString(36).slice(2);
-const empty: Data = { clients: [], jobs: [], candidates: [], matches: [], transcripts: [], tracks: [] };
+const empty: Data = { clients: [], jobs: [], candidates: [], matches: [], transcripts: [], tracks: [], triage: {} };
 
 interface Store extends Data {
   loading: boolean;
@@ -57,6 +61,7 @@ interface Store extends Data {
   updateTranscript: (id: string, p: Partial<Transcript>) => Promise<void>;
   startTrack: (candidateId: string, jobId: string, drafts?: Track["drafts"]) => Promise<Track | null>;
   updateTrack: (id: string, p: Partial<Track>) => Promise<void>;
+  setTriage: (candidateId: string, jobId: string, status: TriageStatus | null) => void;
 }
 
 const Ctx = createContext<Store | null>(null);
@@ -86,7 +91,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     if (DEMO) {
       let d: Data | null = null;
       try { d = JSON.parse(localStorage.getItem(LS_KEY) || "null"); } catch {}
-      setData(normalizeCopy(d ?? demoSeed())); setUserId("demo"); setEmail("Demo workspace"); setIsAdmin(false); setLoading(false);
+      setData(normalizeCopy(d ? { ...d, triage: d.triage ?? {} } : demoSeed())); setUserId("demo"); setEmail("Demo workspace"); setIsAdmin(false); setLoading(false);
       return;
     }
     const { data: u } = await supabase.auth.getUser();
@@ -112,6 +117,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       matches: (m.data ?? []).map((x) => fromRow<MatchRecord>(x)),
       transcripts: (t.data ?? []).map((x) => fromRow<Transcript>(x)),
       tracks: (o.data ?? []).map((x) => fromRow<Track>(x)),
+      triage: {},
     });
     setLoading(false);
   }, []);
@@ -201,6 +207,14 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     updateTrack: async (id, p) => {
       setData((d) => ({ ...d, tracks: d.tracks.map((t) => (t.id === id ? { ...t, ...p } : t)) }));
       await patch("outreach_tracks", id, p);
+    },
+    setTriage: (candidateId, jobId, status) => {
+      setData((d) => {
+        const triage = { ...d.triage };
+        if (status) triage[triageKey(candidateId, jobId)] = status;
+        else delete triage[triageKey(candidateId, jobId)];
+        return { ...d, triage };
+      });
     },
   };
 

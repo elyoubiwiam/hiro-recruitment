@@ -1,6 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowLeft, FileSearch, MapPin, MessagesSquare } from "lucide-react";
-import { EmptyState, money, scoreTone } from "@/components/shared";
+import { ArrowLeft, MapPin } from "lucide-react";
+import { EmptyState, money } from "@/components/shared";
+import { BulkTriage } from "@/components/BulkTriage";
+import { useCandidateDrawer } from "@/components/CandidateDrawer";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useStore } from "@/lib/store";
@@ -23,12 +25,11 @@ export const Route = createFileRoute("/_authenticated/jobs/$jobId")({
 function JobPage() {
   const { jobId } = Route.useParams();
   const { jobs, clients, candidates, matches } = useStore();
+  const drawer = useCandidateDrawer();
   const job = jobs.find((j) => j.id === jobId);
   if (!job) return <EmptyState text="Job not found." />;
   const client = clients.find((c) => c.id === job.clientId);
-  const ranked = candidates
-    .map((c) => ({ c, m: matches.find((m) => m.candidateId === c.id && m.jobId === job.id) }))
-    .sort((a, b) => (b.m?.result.score ?? -1) - (a.m?.result.score ?? -1));
+  const unscored = candidates.filter((c) => !matches.some((m) => m.candidateId === c.id && m.jobId === job.id));
 
   return (
     <div>
@@ -57,23 +58,17 @@ function JobPage() {
             <p className="whitespace-pre-wrap text-sm leading-relaxed text-muted-foreground">{job.description}</p>
           </section>
         </div>
-        <section className="lg:col-span-2">
-          <h2 className="mb-3 text-2xl">Candidates</h2>
-          <div className="space-y-2">
-            {ranked.map(({ c, m }) => (
-              <div key={c.id} className="flex flex-wrap items-center justify-between gap-3 rounded-xl border bg-card p-4">
-                <div className="flex items-center gap-4">
-                  <div className={`w-14 text-center font-display text-2xl ${m ? scoreTone(m.result.score) : "text-muted-foreground"}`}>{m ? `${m.result.score}%` : "Not scored"}</div>
-                  <div><div className="font-semibold">{c.name}</div><div className="text-sm text-muted-foreground">{c.headline}</div></div>
-                </div>
-                <div className="flex gap-2">
-                  <Button asChild size="sm" variant="outline"><Link to="/screening" search={{ candidate: c.id, job: job.id }}><FileSearch className="h-4 w-4" />{m ? "Scorecard" : "Screen"}</Link></Button>
-                  <Button asChild size="sm" variant="outline"><Link to="/outreach" search={{ candidate: c.id, job: job.id }}><MessagesSquare className="h-4 w-4" />Outreach</Link></Button>
-                </div>
+        <div className="space-y-6 lg:col-span-2">
+          <BulkTriage job={job} />
+          {unscored.length > 0 && (
+            <section>
+              <h3 className="mb-2 text-lg">Not yet scored for this role</h3>
+              <div className="flex flex-wrap gap-2">
+                {unscored.map((c) => <Button key={c.id} size="sm" variant="outline" onClick={() => drawer.open(c.id, job.id)}>{c.name}</Button>)}
               </div>
-            ))}
-          </div>
-        </section>
+            </section>
+          )}
+        </div>
       </div>
     </div>
   );

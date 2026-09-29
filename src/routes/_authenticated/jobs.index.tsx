@@ -86,7 +86,7 @@ function Dashboard() {
         <Link to="/candidates" className="group relative rounded-xl border bg-card p-5 text-left transition-all hover:-translate-y-0.5 hover:border-primary hover:shadow-lg hover:shadow-primary/10 cursor-pointer">
           <StatInner label="Candidates" value={candidates.length} />
         </Link>
-        <Link to="/today" className="group relative rounded-xl border bg-card p-5 text-left transition-all hover:-translate-y-0.5 hover:border-primary hover:shadow-lg hover:shadow-primary/10 cursor-pointer">
+        <Link to="/dashboard" className="group relative rounded-xl border bg-card p-5 text-left transition-all hover:-translate-y-0.5 hover:border-primary hover:shadow-lg hover:shadow-primary/10 cursor-pointer">
           <StatInner label="In outreach" value={tracks.filter((t) => t.status === "active").length} />
         </Link>
       </div>

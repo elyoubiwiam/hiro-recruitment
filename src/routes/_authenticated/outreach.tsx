@@ -75,7 +75,7 @@ function Outreach() {
               if (r) toast.success(tracked ? "Tracker drafts updated" : "Sequence added. Step 1 is due today.");
             }}><CalendarPlus className="h-4 w-4" />{tracked ? "Update tracker drafts" : "Track this sequence"}</Button>
           )}
-          {tracked && <Link to="/today" className="text-sm font-medium text-primary hover:underline">In tracker · step {tracked.step + 1}</Link>}
+          {tracked && <Link to="/dashboard" className="text-sm font-medium text-primary hover:underline">In tracker · step {tracked.step + 1}</Link>}
         </div>
       </div>
       {!result ? (
