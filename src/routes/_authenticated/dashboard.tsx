@@ -172,6 +172,8 @@ function Dashboard() {
               </div>
             )}
           </section>
+
+          <div className="grid gap-8 lg:grid-cols-[minmax(0,1.4fr)_minmax(280px,1fr)]">
             <section aria-labelledby="priorities-title" className="min-w-0">
               <div className="mb-4 flex items-center justify-between gap-3">
                 <div>
