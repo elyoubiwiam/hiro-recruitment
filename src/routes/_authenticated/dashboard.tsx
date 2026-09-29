@@ -1,10 +1,12 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowRight, BriefcaseBusiness, CalendarClock, CheckCheck, FileSearch, MessageSquareReply, PhoneCall, Users } from "lucide-react";
+import { ArrowRight, BarChart3, BriefcaseBusiness, CalendarClock, CheckCheck, FileSearch, MessageSquareReply, PhoneCall, Users } from "lucide-react";
 import { PageHeader } from "@/components/AppShell";
 import { Button } from "@/components/ui/button";
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import { useStore } from "@/lib/store";
-import { bucketOf } from "@/lib/tracking";
-import { STAGES } from "@/lib/types";
+import { bucketOf, STATUS_LABEL, STEPS } from "@/lib/tracking";
+import { STAGES, type Track } from "@/lib/types";
+import { Bar, BarChart, CartesianGrid, Cell, Pie, PieChart, XAxis, YAxis } from "recharts";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () => ({
@@ -36,6 +38,47 @@ function Dashboard() {
   const stageCounts = STAGES.map((stage) => ({ ...stage, count: jobs.filter((job) => job.stage === stage.id).length }));
   const maxStage = Math.max(1, ...stageCounts.map((stage) => stage.count));
 
+  const STEP_COLORS = {
+    Connect: "var(--color-chart-1)",
+    InMail: "var(--color-chart-2)",
+    "Follow-up 1": "var(--color-chart-3)",
+    "Follow-up 2": "var(--color-chart-4)",
+    Final: "var(--color-chart-5)",
+  } as const;
+  const stepData = STEPS.map((step) => ({
+    step: step.short,
+    candidates: activeTracks.filter((track) => track.step === STEPS.findIndex((s) => s.short === step.short)).length,
+    color: STEP_COLORS[step.short],
+  }));
+  const stepConfig = Object.fromEntries(STEPS.map((step) => [step.short, { label: step.label, color: STEP_COLORS[step.short] }]));
+
+  const STATUS_COLORS: Record<Track["status"], string> = {
+    active: "var(--color-chart-1)",
+    replied: "var(--color-chart-4)",
+    call_booked: "var(--color-chart-3)",
+    closed: "var(--color-chart-5)",
+  };
+  const statusConfig = { inSequence: { label: "In sequence", color: STATUS_COLORS.active }, replied: { label: "Replied", color: STATUS_COLORS.replied }, callBooked: { label: "Call booked", color: STATUS_COLORS.call_booked }, closed: { label: "Closed", color: STATUS_COLORS.closed } };
+  const statusData = [
+    { key: "inSequence", value: tracks.filter((track) => track.status === "active").length },
+    { key: "replied", value: tracks.filter((track) => track.status === "replied").length },
+    { key: "callBooked", value: tracks.filter((track) => track.status === "call_booked").length },
+    { key: "closed", value: tracks.filter((track) => track.status === "closed").length },
+  ].filter((entry) => entry.value > 0);
+  const statusTotal = statusData.reduce((sum, entry) => sum + entry.value, 0);
+
+  const matchData = jobs
+    .map((job) => {
+      const jobMatches = matches.filter((match) => match.jobId === job.id);
+      return { role: job.title, score: jobMatches.length ? Math.round(jobMatches.reduce((sum, match) => sum + match.result.score, 0) / jobMatches.length) : 0, screened: jobMatches.length > 0 };
+    })
+    .filter((entry) => entry.screened)
+    .slice(0, 6)
+    .map((entry) => ({ ...entry, fill: "var(--color-chart-2)" }));
+  const matchConfig = { score: { label: "Average match", color: "var(--color-chart-2)" } };
+
+  const hasChartData = activeTracks.length > 0 || tracks.length > 0 || matchData.length > 0;
+
   const recommendations = [
     ...(overdue ? [{ key: "overdue", title: `Contact ${overdue} overdue candidate${overdue === 1 ? "" : "s"}`, detail: "Review the next message before sending to avoid further delay.", to: "/today" as const, label: "Review outreach", urgency: "High priority" }] : []),
     ...(dueToday ? [{ key: "today", title: `Contact ${dueToday} candidate${dueToday === 1 ? "" : "s"} due today`, detail: "Send the scheduled message and record the outcome.", to: "/today" as const, label: "Open tracker", urgency: "Due today" }] : []),
@@ -56,6 +99,85 @@ function Dashboard() {
             <Metric icon={CalendarClock} label="Outreach due" value={overdue + dueToday} context={`${overdue} overdue · ${dueToday} due today`} to="/today" emphasis={overdue > 0} />
             <Metric icon={MessageSquareReply} label="Response rate" value={responseRate === null ? "Not available" : `${responseRate}%`} context={`${answered} replies or calls booked / ${contacted.length} contacted sequences`} to="/today" />
             <Metric icon={FileSearch} label="Roles screened" value={`${openJobs.length - jobsWithoutMatches.length}/${openJobs.length}`} context="Open roles with a saved scorecard" to="/screening" />
+          </section>
+
+          <section aria-labelledby="charts-title">
+            <div className="mb-4 flex items-center justify-between gap-3">
+              <div>
+                <h2 id="charts-title" className="text-xl font-semibold">Pipeline charts</h2>
+                <p className="mt-1 text-sm text-muted-foreground">How your outreach and screening work is distributed right now.</p>
+              </div>
+              <BarChart3 className="h-5 w-5 text-muted-foreground" />
+            </div>
+            {loading || !hasChartData ? (
+              <p className="text-sm text-muted-foreground">{loading ? "Loading charts..." : "Charts appear once you have candidates in outreach or saved scorecards."}</p>
+            ) : (
+              <div className="grid gap-4 lg:grid-cols-3">
+                <div className="rounded-lg border bg-card p-5">
+                  <h3 className="text-sm font-semibold">Active sequences by step</h3>
+                  <p className="mt-0.5 text-xs text-muted-foreground">Where waiting candidates sit in the sequence.</p>
+                  <ChartContainer config={stepConfig} className="mt-4 aspect-[16/10] w-full">
+                    <BarChart data={stepData} margin={{ top: 8, right: 4, left: -24, bottom: 0 }}>
+                      <CartesianGrid vertical={false} strokeDasharray="3 3" />
+                      <XAxis dataKey="step" tickLine={false} axisLine={false} tickMargin={8} fontSize={10} interval={0} tickFormatter={(value: string) => (value === "Follow-up 1" ? "FU 1" : value === "Follow-up 2" ? "FU 2" : value)} />
+                      <YAxis allowDecimals={false} tickLine={false} axisLine={false} fontSize={11} width={40} />
+                      <ChartTooltip content={<ChartTooltipContent />} />
+                      <Bar dataKey="candidates" radius={6} maxBarSize={40}>
+                        {stepData.map((entry) => (
+                          <Cell key={entry.step} fill={entry.color} />
+                        ))}
+                      </Bar>
+                    </BarChart>
+                  </ChartContainer>
+                </div>
+
+                <div className="rounded-lg border bg-card p-5">
+                  <h3 className="text-sm font-semibold">Sequence outcomes</h3>
+                  <p className="mt-0.5 text-xs text-muted-foreground">Results across all tracked candidates.</p>
+                  <div className="relative mt-4">
+                    <ChartContainer config={statusConfig} className="mx-auto aspect-square w-full max-w-[220px]">
+                      <PieChart>
+                        <ChartTooltip content={<ChartTooltipContent hideLabel />} />
+                        <Pie data={statusData} dataKey="value" nameKey="key" innerRadius={58} outerRadius={88} strokeWidth={2}>
+                          {statusData.map((entry) => (
+                            <Cell key={entry.key} fill={statusConfig[entry.key as keyof typeof statusConfig].color} />
+                          ))}
+                        </Pie>
+                      </PieChart>
+                    </ChartContainer>
+                    <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
+                      <span className="font-mono text-2xl font-semibold">{statusTotal}</span>
+                      <span className="text-xs text-muted-foreground">tracked</span>
+                    </div>
+                  </div>
+                  <dl className="mt-4 space-y-1.5">
+                    {statusData.map((entry) => (
+                      <div key={entry.key} className="flex items-center justify-between text-xs">
+                        <dt className="flex items-center gap-2 text-muted-foreground">
+                          <span className="h-2.5 w-2.5 rounded-full" style={{ background: statusConfig[entry.key as keyof typeof statusConfig].color }} />
+                          {statusConfig[entry.key as keyof typeof statusConfig].label}
+                        </dt>
+                        <dd className="font-mono font-semibold">{entry.value}</dd>
+                      </div>
+                    ))}
+                  </dl>
+                </div>
+
+                <div className="rounded-lg border bg-card p-5">
+                  <h3 className="text-sm font-semibold">Average match score by role</h3>
+                  <p className="mt-0.5 text-xs text-muted-foreground">Saved scorecards only, scaled to 100.</p>
+                  <ChartContainer config={matchConfig} className="mt-4 aspect-[16/10] w-full">
+                    <BarChart data={matchData} layout="vertical" margin={{ top: 4, right: 12, left: 8, bottom: 0 }}>
+                      <CartesianGrid horizontal={false} strokeDasharray="3 3" />
+                      <XAxis type="number" domain={[0, 100]} tickLine={false} axisLine={false} fontSize={11} />
+                      <YAxis type="category" dataKey="role" tickLine={false} axisLine={false} fontSize={11} width={110} tickFormatter={(value: string) => (value.length > 16 ? `${value.slice(0, 15)}…` : value)} />
+                      <ChartTooltip content={<ChartTooltipContent />} />
+                      <Bar dataKey="score" radius={6} maxBarSize={22} />
+                    </BarChart>
+                  </ChartContainer>
+                </div>
+              </div>
+            )}
           </section>
 
           <div className="grid gap-8 lg:grid-cols-[minmax(0,1.4fr)_minmax(280px,1fr)]">

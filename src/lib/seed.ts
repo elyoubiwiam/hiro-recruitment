@@ -1,4 +1,4 @@
-import type { Candidate, Client, Job, Transcript } from "./types";
+import type { Candidate, Client, Job, MatchRecord, Transcript } from "./types";
 
 const d = (days: number) => new Date(Date.now() - days * 86400000).toISOString();
 
@@ -219,5 +219,68 @@ Notes: Very articulate, strong ownership stories, slightly less AWS depth than G
 - Lives in Brooklyn and is available to work in the office 3 days per week
 - Wants a team where enterprise isn't brand new - asked about Helio's existing enterprise logos
 - Energetic, crisp, very numbers-driven. Slight concern: never sold to marketplaces specifically`,
+  },
+];
+
+const cov = (skill: string, status: "met" | "partial" | "missing", evidence: string) => ({ skill, status, evidence });
+const gap = (criterion: string, severity: "low" | "medium" | "high", note: string) => ({ criterion, severity, note });
+
+export const seedMatches: MatchRecord[] = [
+  {
+    candidateId: "p1", jobId: "j1", createdAt: d(5),
+    result: {
+      score: 93, verdict: "Strong match", summary: "Nine years of backend engineering with deep Kotlin and Kubernetes experience at fintech scale. Aligns with every must-have for the Senior Backend Engineer role.",
+      skillCoverage: [
+        cov("Kotlin", "met", "Led the migration of 40+ services from Java to Kotlin at Vertexa"),
+        cov("Kubernetes", "met", "Owns the EKS platform for 120 microservices, including cost optimization"),
+        cov("PostgreSQL", "partial", "Strong SQL, mostly MySQL in production; has reviewed Postgres plans"),
+      ],
+      strengths: [
+        { point: "Payments-grade reliability", evidence: "Reduced p99 latency by 45% while doubling transaction volume" },
+        { point: "Mentorship", evidence: "Grew a team of 4 engineers into 9 over two years" },
+      ],
+      gaps: [gap("Go", "low", "Never shipped Go in production, but owns Java-to-Kotlin migrations")],
+      redFlags: [],
+      interviewQuestions: [],
+    },
+  },
+  {
+    candidateId: "p2", jobId: "j2", createdAt: d(3),
+    result: {
+      score: 78, verdict: "Good match", summary: "Consistent enterprise seller with MEDDICC discipline and strong fintech references. Commercial rigor is excellent, marketplace experience is thin.",
+      skillCoverage: [
+        cov("Enterprise SaaS sales", "met", "Closed $2.4M ARR over 3 years with an average cycle of 7 months"),
+        cov("MEDDICC", "met", "Uses mutual action plans and multi-threaded deals by default"),
+        cov("Marketplace", "missing", "No marketplace or two-sided platform experience"),
+      ],
+      strengths: [
+        { point: "C-level relationships", evidence: "Sold into CFO and CIO simultaneously in the grocery chain deal" },
+        { point: "Numbers-driven", evidence: "Maintains a personal deal scorecard reviewed weekly" },
+      ],
+      gaps: [gap("Marketplace", "high", "No direct marketplace deals; worth probing in the panel interview")],
+      redFlags: [],
+      interviewQuestions: [],
+    },
+  },
+  {
+    candidateId: "p3", jobId: "j4", createdAt: d(2),
+    result: {
+      score: 71, verdict: "Partial match", summary: "Solid frontend foundation with React and accessibility focus, but lacks staff-level scope and healthcare exposure for the Staff Frontend Engineer role.",
+      skillCoverage: [
+        cov("React", "met", "Ships a 200k-user React app with design system ownership"),
+        cov("Accessibility", "met", "Led WCAG 2.1 AA audit and remediation across the product"),
+        cov("Healthcare", "missing", "No regulated healthcare or HIPAA environment experience"),
+      ],
+      strengths: [
+        { point: "Performance", evidence: "Cut bundle size by 38% and raised Lighthouse score to 96" },
+        { point: "Design partnership", evidence: "Works daily with designers on component APIs" },
+      ],
+      gaps: [
+        gap("Healthcare domain", "medium", "No HIPAA or clinical workflow exposure"),
+        gap("Staff-level scope", "medium", "Mostly feature work, limited cross-team architecture"),
+      ],
+      redFlags: [],
+      interviewQuestions: [],
+    },
   },
 ];
