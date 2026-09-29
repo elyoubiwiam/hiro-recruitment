@@ -41,7 +41,7 @@ export function AppShell({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (loading || reminded.current || !email) return;
     reminded.current = true;
-    if (due > 0) toast(`${due} candidate${due > 1 ? "s" : ""} to contact today`, { description: "Open Today to see personalized drafts." });
+    if (due > 0) toast(`${due} candidate${due > 1 ? "s" : ""} to contact today`, { description: "Review drafts in the outreach tracker." });
   }, [loading, due, email]);
 
   if (PUBLIC.includes(path)) return <>{children}</>;
@@ -84,7 +84,7 @@ export function AppShell({ children }: { children: ReactNode }) {
         <div className="mt-auto space-y-3 rounded-xl border bg-muted/50 p-3 text-xs">
           <div className="truncate font-medium text-foreground">{email}</div>
           {isAdmin && (
-            <div className="flex items-center gap-1 text-accent-foreground"><ShieldCheck className="h-3.5 w-3.5" />Owner · sees all accounts</div>
+            <div className="flex items-center gap-1 text-accent-foreground"><ShieldCheck className="h-3.5 w-3.5" />Owner · access to all accounts</div>
           )}
           <button onClick={() => { localStorage.removeItem("talentdesk-demo-v1"); location.reload(); }} className="flex items-center gap-1.5 text-muted-foreground hover:text-foreground">
             <LogOut className="h-3.5 w-3.5" />Reset example data

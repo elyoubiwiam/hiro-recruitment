@@ -46,7 +46,7 @@ export function CandidateJobPicker({
           <SelectTrigger className="bg-card"><SelectValue placeholder="Select a candidate" /></SelectTrigger>
           <SelectContent>
             {candidates.map((c) => (
-              <SelectItem key={c.id} value={c.id}>{c.name} — {c.headline}</SelectItem>
+              <SelectItem key={c.id} value={c.id}>{c.name} | {c.headline}</SelectItem>
             ))}
           </SelectContent>
         </Select>

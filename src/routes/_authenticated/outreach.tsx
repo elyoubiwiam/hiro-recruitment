@@ -14,9 +14,9 @@ export const Route = createFileRoute("/_authenticated/outreach")({
   validateSearch: z.object({ candidate: z.string().optional(), job: z.string().optional() }),
   head: () => ({
     meta: [
-      { title: "Outreach Generator — Talentdesk" },
+      { title: "Outreach Generator | Talentdesk" },
       { name: "description", content: "Generate tailored LinkedIn and email outreach sequences for candidates." },
-      { property: "og:title", content: "Outreach Generator — Talentdesk" },
+      { property: "og:title", content: "Outreach Generator | Talentdesk" },
       { property: "og:description", content: "Tailored multi-step candidate outreach, instantly." },
     ],
   }),
@@ -56,7 +56,7 @@ function Outreach() {
 
   return (
     <>
-      <PageHeader title="Outreach Generator" subtitle="Multi-step sequences that explain why this person fits this role." />
+      <PageHeader title="Outreach Generator" subtitle="Create tailored outreach for a selected candidate and role." />
       <div className="mb-8 space-y-4 rounded-xl border bg-card p-5">
         <CandidateJobPicker
           candidateId={search.candidate} jobId={search.job}
@@ -70,14 +70,14 @@ function Outreach() {
               const drafts: Record<string, { subject?: string; body: string }> = { "0": { body: result.linkedinConnect }, "1": result.inmail };
               result.emails.slice(0, 3).forEach((e, i) => { drafts[String(i + 2)] = { subject: e.subject, body: e.body }; });
               const r = await startTrack(cand!.id, job!.id, drafts);
-              if (r) toast.success(tracked ? "Tracker drafts updated" : "Added to Today — step 1 is due now");
+              if (r) toast.success(tracked ? "Tracker drafts updated" : "Sequence added. Step 1 is due today.");
             }}><CalendarPlus className="h-4 w-4" />{tracked ? "Update tracker drafts" : "Track this sequence"}</Button>
           )}
           {tracked && <Link to="/today" className="text-sm font-medium text-primary hover:underline">In tracker · step {tracked.step + 1}</Link>}
         </div>
       </div>
       {!result ? (
-        <EmptyState text={loading ? "Writing a personalised sequence…" : "Pick a candidate and a job to generate outreach."} />
+        <EmptyState text={loading ? "Writing a personalized sequence..." : "Pick a candidate and a job to generate outreach."} />
       ) : (
         <ol className="relative space-y-5 border-l-2 border-primary/30 pl-8">
           {steps.map((s, i) => (

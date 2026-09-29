@@ -9,9 +9,9 @@ import { supabase } from "@/integrations/supabase/client";
 export const Route = createFileRoute("/auth")({
   head: () => ({
     meta: [
-      { title: "Sign in — Talentdesk" },
+      { title: "Sign in | Talentdesk" },
       { name: "description", content: "Sign in or create your private Talentdesk recruiting workspace." },
-      { property: "og:title", content: "Sign in — Talentdesk" },
+      { property: "og:title", content: "Sign in | Talentdesk" },
       { property: "og:description", content: "Access your private recruiting workspace." },
     ],
   }),
@@ -48,10 +48,10 @@ function AuthPage() {
       } else {
         const { error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo: window.location.origin + "/reset-password" });
         if (error) throw error;
-        setSent("If an account exists for that email, a reset link is on its way.");
+        setSent("If an account exists for that email, you will receive a password reset link.");
       }
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Something went wrong");
+      toast.error(err instanceof Error ? err.message : "Unable to complete your request. Please try again.");
     } finally {
       setBusy(false);
     }
@@ -66,7 +66,7 @@ function AuthPage() {
           </div>
           <span className="text-lg font-bold tracking-tight">Talentdesk</span>
         </Link>
-        <h1 className="text-xl">{mode === "signin" ? "Welcome back" : mode === "signup" ? "Create your workspace" : "Reset your password"}</h1>
+        <h1 className="text-xl">{mode === "signin" ? "Sign in to Talentdesk" : mode === "signup" ? "Create your workspace" : "Reset your password"}</h1>
         <p className="mb-6 mt-1 text-sm text-muted-foreground">Your data is private to your account.</p>
         {sent ? (
           <div className="rounded-lg bg-accent p-4 text-sm text-accent-foreground">{sent}</div>
@@ -84,7 +84,7 @@ function AuthPage() {
         <div className="mt-6 space-y-1 text-center text-sm text-muted-foreground">
           {mode === "signin" ? (
             <>
-              <button className="block w-full hover:text-foreground" onClick={() => { setMode("signup"); setSent(null); }}>No account? <span className="font-semibold text-primary">Create one</span></button>
+              <button className="block w-full hover:text-foreground" onClick={() => { setMode("signup"); setSent(null); }}>Need an account? <span className="font-semibold text-primary">Create one</span></button>
               <button className="block w-full hover:text-foreground" onClick={() => { setMode("forgot"); setSent(null); }}>Forgot password?</button>
             </>
           ) : (

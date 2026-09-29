@@ -7,9 +7,9 @@ import { supabase } from "@/integrations/supabase/client";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Talentdesk — AI workspace for agency recruiters" },
+      { title: "Talentdesk | Recruitment workspace" },
       { name: "description", content: "Track every candidate touchpoint, get personalized drafts for each step, and match CVs to jobs with explainable AI." },
-      { property: "og:title", content: "Talentdesk — AI workspace for agency recruiters" },
+      { property: "og:title", content: "Talentdesk | Recruitment workspace" },
       { property: "og:description", content: "Outreach tracking, personalized drafts, CV matching and client submissions." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -27,10 +27,10 @@ function Landing() {
   }, [navigate]);
 
   const features = [
-    { icon: CalendarCheck, title: "Never miss a follow-up", text: "Every candidate has a step, a due date and a draft ready for that step." },
+    { icon: CalendarCheck, title: "Manage follow-ups on schedule", text: "Every candidate has a step, a due date and a draft ready for that step." },
     { icon: FileSearch, title: "Explainable matching", text: "Scorecards with evidence, gaps and interview questions." },
     { icon: MessagesSquare, title: "Personalized outreach", text: "Messages written from the candidate's actual background." },
-    { icon: PhoneCall, title: "Client-ready notes", text: "Turn phone screens into submission emails in seconds." },
+    { icon: PhoneCall, title: "Client submission notes", text: "Prepare client submission notes from phone screens." },
   ];
 
   return (
@@ -48,7 +48,7 @@ function Landing() {
         <span className="inline-flex items-center gap-1.5 rounded-full bg-accent px-3 py-1 text-xs font-semibold text-accent-foreground">
           <span className="h-2 w-2 animate-pulse rounded-full bg-primary" />AI drafting for recruiters
         </span>
-        <h1 className="mt-5 max-w-2xl text-5xl leading-tight">Know exactly who to contact today — and what to say.</h1>
+        <h1 className="mt-5 max-w-2xl text-5xl leading-tight">See who needs a response today and prepare the next message.</h1>
         <p className="mt-4 max-w-xl text-lg text-muted-foreground">
           Talentdesk tracks every step of your candidate outreach and prepares a personalized message for the next one.
         </p>

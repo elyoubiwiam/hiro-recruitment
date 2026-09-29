@@ -16,9 +16,9 @@ import type { Track } from "@/lib/types";
 export const Route = createFileRoute("/_authenticated/today")({
   head: () => ({
     meta: [
-      { title: "Today — Talentdesk" },
+      { title: "Today | Talentdesk" },
       { name: "description", content: "Who to contact today, with a personalized draft for each candidate's next step." },
-      { property: "og:title", content: "Today — Talentdesk" },
+      { property: "og:title", content: "Today | Talentdesk" },
       { property: "og:description", content: "Your outreach follow-up queue." },
     ],
   }),
@@ -56,7 +56,7 @@ function Today() {
           <div>
             <h1 className="text-xl">Outreach Tracker</h1>
             <p className="text-sm text-muted-foreground">
-              {loading ? "Loading…" : due ? `${due} candidate${due > 1 ? "s" : ""} require attention today` : "You're all caught up for today"}
+              {loading ? "Loading..." : due ? `${due} candidate${due > 1 ? "s" : ""} require attention today` : "No outreach is due today"}
             </p>
           </div>
           <div className="flex items-center gap-3">
@@ -68,7 +68,7 @@ function Today() {
         </div>
 
         {!loading && tracks.length === 0 && (
-          <div className="p-8"><EmptyState text="No candidates in a sequence yet. Click “Track candidate” to start one." /></div>
+          <div className="p-8"><EmptyState text="No outreach sequences yet. Select Track candidate to add one." /></div>
         )}
 
         {tracks.length > 0 && (
@@ -136,7 +136,7 @@ function Today() {
               );
             })}
             {active.length === 0 && (
-              <div className="p-8"><EmptyState text="No active sequences. Every candidate has replied or been closed." /></div>
+              <div className="p-8"><EmptyState text="No active sequences. All candidates have replied or been closed." /></div>
             )}
           </>
         )}
@@ -295,7 +295,7 @@ function TrackCard({ track: t }: { track: Track }) {
                       <DropdownMenuContent>
                         <DropdownMenuItem onClick={() => updateTrack(t.id, { status: "replied", nextContactAt: null })}><MessageCircleReply className="h-4 w-4" />Candidate replied</DropdownMenuItem>
                         <DropdownMenuItem onClick={() => updateTrack(t.id, { status: "call_booked", nextContactAt: null })}><PhoneCall className="h-4 w-4" />Call booked</DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => updateTrack(t.id, { status: "closed", nextContactAt: null })}><X className="h-4 w-4" />Not interested / close</DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => updateTrack(t.id, { status: "closed", nextContactAt: null })}><X className="h-4 w-4" />Not interested; close sequence</DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
                   </div>

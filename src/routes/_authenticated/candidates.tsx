@@ -15,9 +15,9 @@ import { useStore } from "@/lib/store";
 export const Route = createFileRoute("/_authenticated/candidates")({
   head: () => ({
     meta: [
-      { title: "Candidates — Talentdesk" },
+      { title: "Candidates | Talentdesk" },
       { name: "description", content: "Upload CVs and let AI parse them into structured candidate profiles." },
-      { property: "og:title", content: "Candidates — Talentdesk" },
+      { property: "og:title", content: "Candidates | Talentdesk" },
       { property: "og:description", content: "AI CV parsing into structured candidate profiles." },
     ],
   }),
@@ -65,7 +65,7 @@ function CandidatesPage() {
 
   return (
     <>
-      <PageHeader title="Candidates" subtitle="Drop in a CV — AI turns it into a structured profile." />
+      <PageHeader title="Candidates" subtitle="Upload a CV to create a structured candidate profile." />
       <div className="mb-8 rounded-xl border bg-card p-5">
         <Tabs defaultValue="upload">
           <TabsList><TabsTrigger value="upload">Upload file</TabsTrigger><TabsTrigger value="paste">Paste text</TabsTrigger></TabsList>
@@ -76,13 +76,13 @@ function CandidatesPage() {
               className="mt-3 flex cursor-pointer flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed p-10 text-center hover:border-primary"
             >
               <Upload className="h-6 w-6 text-primary" />
-              <div className="font-semibold">{loading ? "Parsing CV…" : "Drop a CV here or click to browse"}</div>
+              <div className="font-semibold">{loading ? "Parsing CV..." : "Drop a CV here or click to browse"}</div>
               <div className="text-xs text-muted-foreground">PDF, Word (.docx) or .txt</div>
               <input ref={fileRef} type="file" accept=".pdf,.docx,.txt,.md" className="hidden" disabled={loading} onChange={(e) => onFile(e.target.files?.[0])} />
             </label>
           </TabsContent>
           <TabsContent value="paste" className="space-y-3">
-            <Textarea rows={8} placeholder="Paste the full CV text…" value={text} onChange={(e) => setText(e.target.value)} className="mt-3" />
+            <Textarea rows={8} placeholder="Paste the full CV text..." value={text} onChange={(e) => setText(e.target.value)} className="mt-3" />
             <GenerateButton loading={loading} disabled={text.trim().length < 50} onClick={() => parse({ text })}>Parse CV</GenerateButton>
           </TabsContent>
         </Tabs>
@@ -125,7 +125,7 @@ function CandidatesPage() {
               {current.experience.map((e, i) => (
                 <li key={i}>
                   <div className="font-semibold">{e.title} <span className="font-normal text-muted-foreground">· {e.company}</span></div>
-                  <div className="text-xs text-muted-foreground">{e.start} – {e.end}</div>
+                  <div className="text-xs text-muted-foreground">{e.start} to {e.end}</div>
                   {e.highlights?.length > 0 && <ul className="mt-1 list-disc pl-4 text-sm text-muted-foreground">{e.highlights.map((h, j) => <li key={j}>{h}</li>)}</ul>}
                 </li>
               ))}

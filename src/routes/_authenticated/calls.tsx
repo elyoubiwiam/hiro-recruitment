@@ -14,9 +14,9 @@ import type { SynthesisResult } from "@/lib/types";
 export const Route = createFileRoute("/_authenticated/calls")({
   head: () => ({
     meta: [
-      { title: "Call Synthesizer — Talentdesk" },
+      { title: "Call Synthesizer | Talentdesk" },
       { name: "description", content: "Turn phone-screen notes into executive profiles and client submission notes." },
-      { property: "og:title", content: "Call Synthesizer — Talentdesk" },
+      { property: "og:title", content: "Call Synthesizer | Talentdesk" },
       { property: "og:description", content: "Phone screens to client-ready submissions." },
     ],
   }),
@@ -51,7 +51,7 @@ function Calls() {
       if (sel) {
         await updateTranscript(sel.id, { result });
       } else {
-        const id = await addTranscript({ candidateId, jobId, text, title: `Call notes — ${cand.name}`, result });
+        const id = await addTranscript({ candidateId, jobId, text, title: `Call notes: ${cand.name}`, result });
         if (id) setSelId(id);
         setDraft({ candidateId: "", jobId: "", text: "" });
       }
@@ -67,7 +67,7 @@ function Calls() {
 
   return (
     <>
-      <PageHeader title="Call Synthesizer" subtitle="Phone screen in, client-ready submission out." />
+      <PageHeader title="Call Synthesizer" subtitle="Turn phone screen notes into a client submission." />
       <div className="grid gap-6 lg:grid-cols-[260px_1fr]">
         <div className="space-y-2">
           <Button variant={selId === "new" ? "default" : "outline"} className="w-full justify-start" onClick={() => setSelId("new")}><Plus className="h-4 w-4" />New call notes</Button>
@@ -89,7 +89,7 @@ function Calls() {
                 <Input type="file" accept=".txt,.md,.vtt,.srt" className="hidden" onChange={async (e) => { const f = e.target.files?.[0]; if (f) patch({ text: await f.text() }); }} />
               </label>
             </div>
-            <Textarea rows={10} value={text} onChange={(e) => patch({ text: e.target.value })} placeholder="Paste your phone-screen notes or call transcript…" className="font-mono text-xs" />
+            <Textarea rows={10} value={text} onChange={(e) => patch({ text: e.target.value })} placeholder="Paste your phone-screen notes or call transcript..." className="font-mono text-xs" />
             <GenerateButton loading={loading} disabled={!candidateId || !jobId || text.trim().length < 30} onClick={run}>{r ? "Re-synthesize" : "Synthesize"}</GenerateButton>
           </div>
 
@@ -108,7 +108,7 @@ function Calls() {
                   <div><h3 className="mb-2 text-lg">Strengths</h3><ul className="list-disc space-y-1 pl-5 text-sm">{r.strengths.map((h, i) => <li key={i}>{h}</li>)}</ul></div>
                 </div>
                 <h3 className="mb-1 mt-5 text-lg">Culture fit</h3><p className="text-sm text-muted-foreground">{r.cultureFit}</p>
-                {r.concerns.length > 0 && <><h3 className="mb-1 mt-5 text-lg">Watch-outs</h3><ul className="list-disc space-y-1 pl-5 text-sm text-muted-foreground">{r.concerns.map((h, i) => <li key={i}>{h}</li>)}</ul></>}
+                {r.concerns.length > 0 && <><h3 className="mb-1 mt-5 text-lg">Points to clarify</h3><ul className="list-disc space-y-1 pl-5 text-sm text-muted-foreground">{r.concerns.map((h, i) => <li key={i}>{h}</li>)}</ul></>}
               </section>
               <section className="rounded-lg border-2 border-primary/30 bg-card p-6">
                 <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
@@ -125,7 +125,7 @@ function Calls() {
               </section>
             </>
           ) : (
-            <EmptyState text={loading ? "Synthesizing the call…" : "Synthesize to get an executive profile and submission note."} />
+            <EmptyState text={loading ? "Synthesizing the call..." : "Synthesize to get an executive profile and submission note."} />
           )}
         </div>
       </div>
