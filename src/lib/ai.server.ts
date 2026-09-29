@@ -80,7 +80,7 @@ export async function callAI(task: Task, payload: any) {
       reasoning: { effort: "low", summary: "auto" },
       include: ["reasoning.encrypted_content"],
       instructions: SYSTEM[task],
-      input: [{ role: "user", content: buildContent(task, payload) }],
+      input: [{ role: "user", content: [...buildContent(task, payload), { type: "input_text", text: "Respond with a single JSON object." }] }],
       text: { format: { type: "json_object" } },
     }),
   });
