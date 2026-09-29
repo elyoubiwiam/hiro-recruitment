@@ -17,9 +17,9 @@ import { STAGES, type Job, type Stage } from "@/lib/types";
 export const Route = createFileRoute("/_authenticated/jobs/")({
   head: () => ({
     meta: [
-      { title: "Clients & Jobs | Talentdesk" },
+      { title: "Clients & Jobs | Hiro" },
       { name: "description", content: "Manage agency clients and open job requisitions in list or pipeline view." },
-      { property: "og:title", content: "Clients & Jobs | Talentdesk" },
+      { property: "og:title", content: "Clients & Jobs | Hiro" },
       { property: "og:description", content: "Manage agency clients and open job requisitions." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },

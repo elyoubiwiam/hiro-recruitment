@@ -14,9 +14,9 @@ import type { SynthesisResult } from "@/lib/types";
 export const Route = createFileRoute("/_authenticated/calls")({
   head: () => ({
     meta: [
-      { title: "Call Synthesizer | Talentdesk" },
+      { title: "Call Synthesizer | Hiro" },
       { name: "description", content: "Turn phone-screen notes into executive profiles and client submission notes." },
-      { property: "og:title", content: "Call Synthesizer | Talentdesk" },
+      { property: "og:title", content: "Call Synthesizer | Hiro" },
       { property: "og:description", content: "Phone screens to client-ready submissions." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },

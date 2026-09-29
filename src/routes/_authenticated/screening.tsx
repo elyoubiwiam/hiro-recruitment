@@ -13,9 +13,9 @@ export const Route = createFileRoute("/_authenticated/screening")({
   validateSearch: z.object({ candidate: z.string().optional(), job: z.string().optional() }),
   head: () => ({
     meta: [
-      { title: "Match Scorecard | Talentdesk" },
+      { title: "Match Scorecard | Hiro" },
       { name: "description", content: "Explainable AI match scorecards for candidates against open jobs." },
-      { property: "og:title", content: "Match Scorecard | Talentdesk" },
+      { property: "og:title", content: "Match Scorecard | Hiro" },
       { property: "og:description", content: "Explainable AI candidate-job matching." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
