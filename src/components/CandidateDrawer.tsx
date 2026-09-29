@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
-import { Check, Copy, GraduationCap, Loader2, MapPin, RotateCcw, Share2, Sparkles } from "lucide-react";
+import { Check, Copy, Download, FileText, GraduationCap, Loader2, MapPin, RotateCcw, Share2, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 import { EmptyState, GenerateButton } from "@/components/shared";
 import { Scorecard } from "@/components/Scorecard";
@@ -14,6 +14,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { runAI } from "@/lib/ai.functions";
 import { useStore } from "@/lib/store";
+import { getCvFile } from "@/lib/cv-files";
 import { dueLabel, markSentPatch, STATUS_LABEL, STEPS } from "@/lib/tracking";
 import type { Candidate, Job, MatchResult, SynthesisResult } from "@/lib/types";
 
@@ -86,9 +87,39 @@ function DrawerBody({ candidateId, initialJobId }: { candidateId: string; initia
   );
 }
 
+function CvFileCard({ c }: { c: Candidate }) {
+  const [file, setFile] = useState<File | null | undefined>(undefined);
+  useEffect(() => {
+    getCvFile(c.id).then((f) => setFile(f ?? null)).catch(() => setFile(null));
+  }, [c.id]);
+  if (file === undefined) return null;
+  if (!file) return <div className="rounded-xl border border-dashed p-3 text-xs text-muted-foreground">No original CV file saved for this candidate.</div>;
+  const open = (download: boolean) => {
+    const url = URL.createObjectURL(file);
+    const a = document.createElement("a");
+    a.href = url;
+    if (download) a.download = file.name; else a.target = "_blank";
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(url), 60000);
+  };
+  return (
+    <div className="flex items-center justify-between gap-3 rounded-xl border bg-muted/30 p-3">
+      <div className="flex min-w-0 items-center gap-2">
+        <FileText className="h-5 w-5 shrink-0 text-primary" />
+        <div className="min-w-0"><div className="truncate text-sm font-medium">{file.name}</div><div className="text-xs text-muted-foreground">{Math.max(1, Math.round(file.size / 1024))} KB{c.cvFile ? ` · uploaded ${new Date(c.cvFile.uploadedAt).toLocaleDateString()}` : ""}</div></div>
+      </div>
+      <div className="flex shrink-0 gap-1">
+        <Button size="sm" variant="outline" onClick={() => open(false)}>View</Button>
+        <Button size="sm" variant="outline" onClick={() => open(true)}><Download className="h-4 w-4" /></Button>
+      </div>
+    </div>
+  );
+}
+
 function ProfileTab({ c }: { c: Candidate }) {
   return (
     <div className="space-y-5 pt-2">
+      <CvFileCard c={c} />
       {c.location && <div className="flex items-center gap-1 text-sm text-muted-foreground"><MapPin className="h-3.5 w-3.5" />{c.location}</div>}
       <p className="text-sm leading-relaxed">{c.summary}</p>
       <div className="flex flex-wrap gap-1.5">{c.skills.map((s) => <Badge key={s} variant="secondary">{s}</Badge>)}</div>
