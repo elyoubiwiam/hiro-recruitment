@@ -38,6 +38,40 @@ function Dashboard() {
   const stageCounts = STAGES.map((stage) => ({ ...stage, count: jobs.filter((job) => job.stage === stage.id).length }));
   const maxStage = Math.max(1, ...stageCounts.map((stage) => stage.count));
 
+  const stepData = STEPS.map((step, index) => ({
+    step: step.short,
+    candidates: activeTracks.filter((track) => track.step === index).length,
+  }));
+  const STEP_COLORS = ["var(--color-chart-1)", "var(--color-chart-2)", "var(--color-chart-3)", "var(--color-chart-4)", "var(--color-chart-5)"];
+  const stepConfig = Object.fromEntries(STEPS.map((step, index) => [step.short, { label: step.label, color: STEP_COLORS[index] }]));
+
+  const STATUS_COLORS: Record<Track["status"], string> = {
+    active: "var(--color-chart-1)",
+    replied: "var(--color-chart-4)",
+    call_booked: "var(--color-chart-3)",
+    closed: "var(--color-chart-5)",
+  };
+  const statusConfig = { inSequence: { label: "In sequence", color: STATUS_COLORS.active }, replied: { label: "Replied", color: STATUS_COLORS.replied }, callBooked: { label: "Call booked", color: STATUS_COLORS.call_booked }, closed: { label: "Closed", color: STATUS_COLORS.closed } };
+  const statusData = [
+    { key: "inSequence", value: tracks.filter((track) => track.status === "active").length },
+    { key: "replied", value: tracks.filter((track) => track.status === "replied").length },
+    { key: "callBooked", value: tracks.filter((track) => track.status === "call_booked").length },
+    { key: "closed", value: tracks.filter((track) => track.status === "closed").length },
+  ].filter((entry) => entry.value > 0);
+  const statusTotal = statusData.reduce((sum, entry) => sum + entry.value, 0);
+
+  const matchData = jobs
+    .map((job) => {
+      const jobMatches = matches.filter((match) => match.jobId === job.id);
+      return { role: job.title, score: jobMatches.length ? Math.round(jobMatches.reduce((sum, match) => sum + match.score, 0) / jobMatches.length) : 0, screened: jobMatches.length > 0 };
+    })
+    .filter((entry) => entry.screened)
+    .slice(0, 6)
+    .map((entry) => ({ ...entry, fill: "var(--color-chart-2)" }));
+  const matchConfig = { score: { label: "Average match", color: "var(--color-chart-2)" } };
+
+  const hasChartData = activeTracks.length > 0 || tracks.length > 0 || matchData.length > 0;
+
   const recommendations = [
     ...(overdue ? [{ key: "overdue", title: `Contact ${overdue} overdue candidate${overdue === 1 ? "" : "s"}`, detail: "Review the next message before sending to avoid further delay.", to: "/today" as const, label: "Review outreach", urgency: "High priority" }] : []),
     ...(dueToday ? [{ key: "today", title: `Contact ${dueToday} candidate${dueToday === 1 ? "" : "s"} due today`, detail: "Send the scheduled message and record the outcome.", to: "/today" as const, label: "Open tracker", urgency: "Due today" }] : []),
