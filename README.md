@@ -45,4 +45,4 @@ Create and organise clients and open roles (title, salary, location, must-have s
 
 ---
 
-Built by **Wiam El Youbi**.
+Built by **Wiam El Youbi**, [wiam-elyoubi.com](https://wiam-elyoubi.com).
