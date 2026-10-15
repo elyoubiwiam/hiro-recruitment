@@ -1,44 +1,48 @@
-# Lovable Recruit AI
+# Hiro
 
-Build an AI-native recruitment workspace for agency recruiters inspired by Spott (spott.io) with three core workflows:
+**Track, manage and optimise your recruiter process.**
 
-1. Client & Job Management:
-- Create and organize clients and open job requisitions (job title, department, salary range, location/remote, must-have skills, soft factors, and job description).
-- Clean, modern dashboard with list and pipeline stage views.
+Hiro is an AI-native recruitment workspace for agency recruiters. It tracks every candidate touchpoint, drafts a personalised message for each step, matches CVs to jobs with explainable AI, and helps prepare client submissions.
 
-2. CV Screening & Explainable Matching:
-- Upload candidate CVs/resumes (PDF, Word, or paste text).
-- AI parsing into structured profiles (experience, skills, education, contact info).
-- Detailed, transparent match scorecard against the selected job: match percentage, breakdown of strengths, flagged missing criteria or red flags, and suggested interview questions to probe gaps.
+**Live app:** https://hiro-recruitment.lovable.app
 
-3. Outbound Outreach Generator:
-- Select a candidate profile and an active job to instantly generate tailored multi-step cold outreach sequences (LinkedIn connection request, InMail pitch, and follow-up emails) highlighting why their specific background fits the role.
+---
 
-4. Call Transcript Synthesizer & Client Submission Note:
-- Upload or paste recruiter phone screen notes or call transcripts.
-- AI synthesis into an executive candidate profile and client-ready submission note (key highlights, compensation expectations, notice period/availability, culture fit, and strengths) ready to copy or email straight to client hiring managers.
+## Key features
 
-Include realistic sample agency data (clients, tech/sales jobs, candidate CVs, and call transcripts) so the workflows are immediately interactive.
+### Dashboard that sets priorities
+KPIs, charts and recommended next actions based on your live pipeline: who to contact today, response rates and coverage gaps.
 
-This project was built with [Lovable](https://lovable.dev).
+### Explainable matching
+Upload CVs as PDF or Word, or paste the text. AI parses each one into a structured profile and scores it against a job. The scorecard shows the match percentage, evidence for each strength, missing criteria or red flags, and suggested interview questions to probe the gaps. Bulk triage handles many CVs at once.
 
-**Live app**: https://hiro-recruitment.lovable.app
+### Personalised outreach
+Tracking for each candidate covers outreach steps, status, dates and next-contact date. Each step gets a draft message written from the candidate's actual background and why it fits the role, and in-app reminders flag what's due.
 
-## Build with Lovable
+### Client submission notes
+Turn phone-screen notes into polished client submission notes.
 
-Continue developing this project in the [Lovable editor](https://lovable.dev/projects/5bac6c91-ea1b-4724-be52-9605b35d3e28).
+### Clients and jobs
+Create and organise clients and open roles (title, salary, location, must-have skills, soft factors and description), with list and pipeline views.
 
-- **Ship faster**: describe what you want to build and Lovable handles the code.
-- **Stay in sync**: every change made in Lovable is committed straight to this repository.
-- **Full ownership**: this code is yours. Push to `main` on GitHub and your changes sync back into Lovable, ready for your next prompt.
+## Workspace pages
 
-## Development
+**Today** · **Dashboard** · **Jobs** · **Candidates** · **Screening** · **Outreach** · **Calls**
 
-Prefer working locally? You need Node.js and npm — [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating).
+## Accounts and data
 
-```sh
-git clone <this-repository-url>
-cd <repository-name>
-npm i
-npm run dev
-```
+- Sign-up and login are required.
+- Each recruiter sees only their own data.
+- Data is stored in Lovable Cloud (Supabase) with row-level access rules.
+
+## Tech stack
+
+- React, TypeScript, TanStack Start and Router, Vite
+- Tailwind CSS with shadcn/ui components and Recharts
+- Lovable Cloud (Supabase) for authentication and database
+- AI parsing, matching and drafting through server functions
+- Built and hosted with [Lovable](https://lovable.dev)
+
+---
+
+Built by **Wiam El Youbi**.
